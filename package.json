@@ -1,0 +1,47 @@
+{
+  "name": "react-html5-parser",
+  "version": "0.1.0",
+  "description": "Parse html into react",
+  "type": "module",
+  "exports": "./dist/index.js",
+  "scripts": {
+    "build": "microbundle -o dist/ --sourcemap false --no-compress --jsx React.createElement",
+    "dev": "microbundle watch -o dist/ --sourcemap false --no-compress --jsx React.createElement",
+    "test": "jest",
+    "test:watch": "jest --watchAll"
+  },
+  "author": "devmaxxx",
+  "license": "MIT",
+  "devDependencies": {
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "@types/jest": "^29.2.0",
+    "@types/testing-library__jest-dom": "^5.14.5",
+    "jest": "^29.2.1",
+    "jest-environment-jsdom": "^29.2.1",
+    "microbundle": "^0.15.1",
+    "prettier": "^2.7.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "ts-jest": "^29.0.3",
+    "typescript": "^4.8.4"
+  },
+  "dependencies": {
+    "@types/react": "^18.0.21",
+    "@types/react-dom": "^18.0.6",
+    "dompurify": "^2.4.0"
+  },
+  "engines": {
+    "node": ">=14.16"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "setupFilesAfterEnv": [
+      "<rootDir>/__tests__/setupTests.ts"
+    ],
+    "testMatch": [
+      "**/__tests__/**/*.test.ts?(x)"
+    ],
+    "testEnvironment": "jsdom"
+  }
+}
