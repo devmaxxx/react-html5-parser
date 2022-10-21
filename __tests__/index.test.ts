@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import { parse } from "../src";
+import parse from "../src";
 
 describe("parse", () => {
   it("should be defined and function", () => {
@@ -9,10 +9,12 @@ describe("parse", () => {
   });
 
   it("should return string", () => {
-    const data = parse("<span>Hello</span>");
+    const node = parse("<span class='active'>Hello</span>");
+    render(React.createElement("div", null, node));
 
-    render(React.createElement("div", null, data));
-    const elem = screen.getByText(/Hello/i);
-    expect(elem).toBeInTheDocument();
+    const element = screen.getByText(/Hello/i);
+
+    expect(element).toBeInTheDocument();
+    expect(element.className).toBe("active");
   });
 });
