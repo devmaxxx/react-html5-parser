@@ -3,7 +3,12 @@ import { possibleStandardNames } from "./possibleStandardNames";
 
 describe("#attributes", () => {
   it("should support all html attributes", () => {
-    const excludeKeys = ["classname", "dangerouslysetinnerhtml", "innerhtml"];
+    const excludeKeys = [
+      "classname",
+      "htmlfor",
+      "dangerouslysetinnerhtml",
+      "innerhtml",
+    ];
     const includeKeys = ["panose1", "panose-1"];
 
     // ignore prop with the same key value except "panose1"

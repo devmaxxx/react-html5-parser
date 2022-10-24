@@ -20,13 +20,13 @@ type Options = {
 };
 
 export function renderElement(
-  key: string,
+  key: number | string,
   node: Element,
   options: Options
 ): ReactElement {
-  const { attributes, childNodes, nodeName } = node;
-  const type = nodeName.toLowerCase() as NodeType;
-  const props = { key, ...attrsToProps(attributes) };
+  const childNodes = node.childNodes;
+  const type = node.nodeName.toLowerCase() as NodeType;
+  const props = { key, ...attrsToProps(node.attributes) };
   const children = childNodes.length ? render(childNodes, options) : [];
   const comps = options.components;
   const overrideRenderElement = comps && type in comps && comps[type];
@@ -38,13 +38,14 @@ export function renderElement(
 
 export function render(nodes: NodeListOf<ChildNode>, options: Options) {
   return Array.from(nodes).reduce<ReactNode[]>((acc, node, key) => {
-    const isTextNode = node.nodeType === Node.TEXT_NODE;
+    const nodeType = node.nodeType;
+    const isTextNode = nodeType === Node.TEXT_NODE;
 
-    if (isTextNode || node.nodeType === Node.ELEMENT_NODE) {
+    if (isTextNode || nodeType === Node.ELEMENT_NODE) {
       acc.push(
         isTextNode
           ? node.nodeValue
-          : renderElement(String(key), node as Element, options)
+          : renderElement(key, node as Element, options)
       );
     }
 
