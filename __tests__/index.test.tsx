@@ -9,7 +9,10 @@ describe("parse", () => {
   });
 
   it("should return string", () => {
-    const node = parse("<span class='active'>Hello</span>");
+    const node = parse(
+      "<div class='active' style='color: red; font-size-adjust: initial; font-weight: 600' id>Hello <span>world</span><span>!</span><b></b></div>",
+      { components: { span: (props) => <div {...props} /> } }
+    );
     render(React.createElement("div", null, node));
 
     const element = screen.getByText(/Hello/i);
