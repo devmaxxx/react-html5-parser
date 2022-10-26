@@ -10,12 +10,11 @@ const attrs =
 
 export const attributesMap = attrs.split(" ").reduce<AtributesMap>(
   (acc, prop) => {
-    const isNoCamelCase = prop.match(/[-:]/);
     const value = camelCase(prop) as AtributesPropKeys;
 
     acc[prop.toLowerCase()] = value;
 
-    if (isNoCamelCase) {
+    if (prop.match(/[-:]/)) {
       acc[value.toLowerCase()] = value;
     }
 
@@ -28,11 +27,11 @@ export const attributesMap = attrs.split(" ").reduce<AtributesMap>(
 );
 
 export function styleToObject(style: string): CSSProperties {
-  return style
+  const st = style
     .replace(/\\*.*?\\*/g, "") // remove comments
     .split(/ ?; ?/)
     .reduce<Record<string, string | number>>((acc, prop: string) => {
-      const [key, value] = prop.split(/ ?: ?/);
+      const [key, value] = prop.split(/ ?: ? /);
 
       if (key && value) {
         acc[camelCase(key)] = Number.isNaN(+value) ? value : +value;
@@ -40,6 +39,8 @@ export function styleToObject(style: string): CSSProperties {
 
       return acc;
     }, {});
+
+  return st;
 }
 
 export function attrsToProps(attrs: NamedNodeMap): Attributes {

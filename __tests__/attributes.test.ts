@@ -1,4 +1,4 @@
-import { attributesMap } from "../src/attributes";
+import { attributesMap } from "../src/core/attributes";
 import { possibleStandardNames } from "./possibleStandardNames";
 
 describe("#attributes", () => {

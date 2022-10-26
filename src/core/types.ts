@@ -2,7 +2,7 @@ import { ReactElement, ReactHTML } from "react";
 import { Attributes } from "./attributes";
 import { Config, Html } from "./parser";
 
-type NodeType = keyof ReactHTML;
+export type NodeType = keyof ReactHTML;
 type Components = Record<
   NodeType,
   (props: Attributes, node: Element) => ReactElement

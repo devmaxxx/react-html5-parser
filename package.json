@@ -2,18 +2,26 @@
   "name": "react-html5-parser",
   "version": "0.1.0",
   "description": "Parse html into react",
-  "main": "dist/index.js",
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.esm.js",
   "umd:main": "dist/index.umd.js",
-  "module": "dist/index.m.js",
   "source": "src/index.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.modern.js",
+      "umd": "./dist/goober.umd.js"
+    }
+  },
   "scripts": {
-    "dev": "microbundle watch -o dist/ --sourcemap false --no-compress",
+    "dev": "microbundle watch --sourcemap false --no-compress --external react",
     "size-check": "filesize",
     "clean": "rm -rf dist",
-    "build:core": "npm run clean && npm run build:dist && npm run size-check",
-    "build:lib": "microbundle --name index --no-sourcemap --generateTypes false --external react",
-    "build:dist": "npm run build:lib -- --output dist",
-    "build:debug": "npm run build:lib -- --output debug --no-compress",
+    "build:lib": "microbundle src/*.ts --no-sourcemap --generateTypes false --external react",
+    "build:debug": "npm run build:lib -- -o debug --no-compress",
+    "build": "npm run clean && npm run build:lib",
+    "build:size": "npm run build && npm run size-check",
     "test": "jest",
     "test:watch": "jest --watchAll"
   },
@@ -57,8 +65,11 @@
     "dist"
   ],
   "filesize": {
-    "track": [
-      "./dist/**/*.js"
-    ]
+    "./dist/index.modern.js": {
+      "gzip": "9.7 kB"
+    },
+    "./dist/index.cjs": {
+      "gzip": "9.7 kB"
+    }
   }
 }
