@@ -66,10 +66,10 @@
   ],
   "filesize": {
     "./dist/index.modern.js": {
-      "gzip": "9.7 kB"
+      "gzip": "10 kB"
     },
     "./dist/index.cjs": {
-      "gzip": "9.7 kB"
+      "gzip": "10 kB"
     }
   }
 }

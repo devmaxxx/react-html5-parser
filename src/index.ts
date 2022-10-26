@@ -3,7 +3,7 @@ import { render } from "./core/render";
 import { Options } from "./core/types";
 
 export default function parse(html: p.Html, options: Options = {}) {
-  if (typeof html !== "string") return [];
+  if (typeof html !== "string") return;
 
   const doc = p.parse(html, options.config || {});
 

@@ -37,6 +37,6 @@ export function renderNodes(nodeList: NodeListOf<ChildNode>, options: Options) {
   }, []);
 }
 
-export function render(doc: DocumentFragment, options: Options) {
+export function render(doc: DocumentFragment, options: Options): ReactElement {
   return createElement(Fragment, {}, renderNodes(doc.childNodes, options));
 }
