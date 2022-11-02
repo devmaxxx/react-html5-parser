@@ -1,5 +1,4 @@
 import { createElement, ReactElement, ReactNode, Fragment } from "react";
-
 import { attrsToProps } from "./attributes";
 import { Options, NodeType } from "./types";
 

@@ -1,9 +1,5 @@
-import { AllHTMLAttributes, CSSProperties } from "react";
 import { camelCase } from "./utils";
-
-export type Attributes = AllHTMLAttributes<Element>;
-export type AtributesPropKeys = keyof Attributes;
-export type AtributesMap = Partial<Record<string, AtributesPropKeys>>;
+import { Attributes, AtributesPropKeys, AtributesMap } from "./types";
 
 export const CSS_COMMENTS_REGEX = /\/\*[^*]*\*+([^/*][^*]*\*+)*\//g;
 export const CSS_RULES_REGEX =
@@ -29,7 +25,7 @@ export const attributesMap = ATTRIBUTES.split(" ").reduce<AtributesMap>(
   }
 );
 
-export function styleToObject(style: string): CSSProperties {
+export function styleToObject(style: string): Attributes["style"] {
   const filteredStyle = style.replace(CSS_COMMENTS_REGEX, "");
   const rules: Record<string, string | number> = {};
   let arr: RegExpExecArray | null;
