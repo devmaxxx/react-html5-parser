@@ -12,6 +12,11 @@
       "require": "./dist/index.cjs",
       "import": "./dist/index.modern.js",
       "umd": "./dist/index.umd.js"
+    },
+    "./pure": {
+      "require": "./dist/pure.cjs",
+      "import": "./dist/pure.modern.js",
+      "umd": "./dist/pure.umd.js"
     }
   },
   "files": [
@@ -73,6 +78,12 @@
     },
     "./dist/index.cjs": {
       "gzip": "10 kB"
+    },
+    "./dist/pure.modern.js": {
+      "gzip": "2 kB"
+    },
+    "./dist/pure.cjs": {
+      "gzip": "2 kB"
     }
   }
 }
