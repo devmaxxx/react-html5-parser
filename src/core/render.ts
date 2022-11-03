@@ -5,18 +5,16 @@ import { Options, NodeType } from "./types";
 export function renderElement(
   key: number | string,
   node: Element,
-  options: Options
+  options: Options,
+  undef?: undefined
 ): ReactElement {
   const childNodes = node.childNodes;
   const type = node.tagName.toLowerCase() as NodeType;
-  const props = { key, ...attrsToProps(node.attributes) };
-  const children = childNodes.length
-    ? renderNodes(childNodes, options)
-    : undefined;
-  const comps = options.components;
-  const overrideRenderElement = comps && type in comps && comps[type];
+  const props = Object.assign({ key }, attrsToProps(node.attributes));
+  const children = childNodes.length ? renderNodes(childNodes, options) : undef;
+  const components = options.components || {};
 
-  return createElement(overrideRenderElement || type, props, children);
+  return createElement(components[type] || type, props, children);
 }
 
 export function renderNodes(nodeList: NodeListOf<ChildNode>, options: Options) {
