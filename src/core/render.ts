@@ -1,11 +1,11 @@
-import { createElement, ReactElement, ReactNode, Fragment } from "react";
+import { createElement, ReactElement, ReactNode } from "react";
 import { attrsToProps } from "./attributes";
-import { Options, NodeType } from "./types";
+import { RenderOptions, NodeType } from "./types";
 
 export function renderElement(
   key: number | string,
   node: Element,
-  options: Options,
+  options: RenderOptions,
   undef?: undefined
 ): ReactElement {
   const childNodes = node.childNodes;
@@ -17,7 +17,10 @@ export function renderElement(
   return createElement(components[type] || type, props, children);
 }
 
-export function renderNodes(nodeList: NodeListOf<ChildNode>, options: Options) {
+export function renderNodes(
+  nodeList: NodeListOf<ChildNode>,
+  options: RenderOptions
+) {
   return Array.from(nodeList).reduce<ReactNode[]>((acc, node, key) => {
     const nodeType = node.nodeType;
     const isTextNode = nodeType === Node.TEXT_NODE;
@@ -32,8 +35,4 @@ export function renderNodes(nodeList: NodeListOf<ChildNode>, options: Options) {
 
     return acc;
   }, []);
-}
-
-export function render(doc: DocumentFragment, options: Options): ReactElement {
-  return createElement(Fragment, {}, renderNodes(doc.childNodes, options));
 }

@@ -1,5 +1,4 @@
 import { AllHTMLAttributes, ReactElement, ReactHTML } from "react";
-import { Config } from "./sanitizer";
 
 export type Attributes = AllHTMLAttributes<Element>;
 export type AtributesPropKeys = keyof Attributes;
@@ -11,7 +10,10 @@ type Components = Record<
   (props: Attributes) => ReactElement
 >;
 
-export type Options = {
+export type RenderOptions = {
   components?: Partial<Components>;
-  config?: Config;
+};
+
+export type PureParseOptions = RenderOptions & {
+  sanitize?: (html: string) => string;
 };

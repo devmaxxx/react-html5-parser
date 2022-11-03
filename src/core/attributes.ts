@@ -33,7 +33,8 @@ export function styleToObject(style: string): Attributes["style"] {
   while ((arr = CSS_RULES_REGEX.exec(filteredStyle))) {
     const key = arr[1];
     const value = arr[2];
-    rules[key[0] === "-" ? key : camelCase(key)] = Number.isNaN(+value)
+
+    rules[key[0] == "-" ? key : camelCase(key)] = Number.isNaN(+value)
       ? value
       : +value;
   }
@@ -48,7 +49,11 @@ export function attrsToProps(attrs: NamedNodeMap): Attributes {
     const attrKey = attributesMap[nodeName] || (nodeName as AtributesPropKeys);
 
     acc[attrKey] =
-      attrKey === "style" && nodeValue ? styleToObject(nodeValue) : nodeValue;
+      attrKey == "style"
+        ? nodeValue
+          ? styleToObject(nodeValue)
+          : {}
+        : nodeValue;
 
     return acc;
   }, {});

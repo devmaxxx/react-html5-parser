@@ -1,15 +1,17 @@
 import { createElement, Fragment } from "react";
-import { render } from "./core/render";
-import { Options } from "./core/types";
+import { renderNodes } from "./core/render";
+import { PureParseOptions } from "./core/types";
 
-export default function parse(
-  html: string,
-  options: Omit<Options, "config"> = {}
-) {
+export default function parse(html: string, options: PureParseOptions = {}) {
   if (!(typeof html === "string" && html)) return createElement(Fragment);
 
+  const sanitize = options.sanitize;
   const template = document.createElement("template");
-  template.innerHTML = html;
+  template.innerHTML = sanitize ? sanitize(html) : html;
 
-  return render(template.content, options);
+  return createElement(
+    Fragment,
+    {},
+    renderNodes(template.content.childNodes, options)
+  );
 }

@@ -41,13 +41,13 @@ describe("parse", () => {
 
   it("should parse components", () => {
     const node = parse(
-      "Hello,<c>!</c><div class='active' style='color: red; font-size-adjust: initial; font-weight: 600' id>, world<span>!</span><b></b></div>",
+      "Hello,<c>!</c><div class='active' style='color: red; font-size-adjust: initial; font-weight: 600' id>, world<span style>!</span><b></b></div>",
       {
         components: {
           span: (props) => <b {...props} />,
           c: (props) => <b {...props} />,
         },
-        config: {
+        domConfig: {
           ADD_TAGS: ["c"],
         },
       }
