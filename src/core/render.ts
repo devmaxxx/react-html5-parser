@@ -1,38 +1,48 @@
-import { createElement, ReactElement, ReactNode } from "react";
+import { ReactNode, createElement } from "react";
+import { identity } from "./utils";
 import { attrsToProps } from "./attributes";
-import { RenderOptions, NodeType } from "./types";
+import { RenderOptions } from "./types";
 
-export function renderElement(
-  key: number | string,
-  node: Element,
-  options: RenderOptions,
-  undef?: undefined
-): ReactElement {
-  const childNodes = node.childNodes;
-  const type = node.tagName.toLowerCase() as NodeType;
-  const props = Object.assign({ key }, attrsToProps(node.attributes));
-  const children = childNodes.length ? renderNodes(childNodes, options) : undef;
-  const components = options.components || {};
+export function renderNode(
+  node: Node,
+  key: number,
+  options: RenderOptions
+): ReactNode {
+  const { mapNode, mapElement, components } = options;
+  const _mapNode = mapNode || identity;
+  const _node = _mapNode(node, key, options);
 
-  return createElement(components[type] || type, props, children);
+  if (!(_node && _node instanceof Node)) {
+    return _node;
+  }
+
+  const nodeType = _node.nodeType;
+
+  if (nodeType === 3) {
+    return _node.nodeValue;
+  }
+
+  if (nodeType === 1) {
+    const { childNodes, nodeName, attributes } = _node as Element;
+    const _nodeName = nodeName.toLowerCase();
+    const children = childNodes.length
+      ? renderNodes(childNodes, options)
+      : undefined;
+    const props = Object.assign({ key, children }, attrsToProps(attributes));
+    const renderElement = (components && components[_nodeName]) || mapElement;
+
+    return renderElement
+      ? renderElement(props, _nodeName, options)
+      : createElement(_nodeName, props);
+  }
 }
 
 export function renderNodes(
-  nodeList: NodeListOf<ChildNode>,
+  nodeList: NodeListOf<Node>,
   options: RenderOptions
-) {
-  return Array.from(nodeList).reduce<ReactNode[]>((acc, node, key) => {
-    const nodeType = node.nodeType;
-    const isTextNode = nodeType === Node.TEXT_NODE;
-
-    if (isTextNode || nodeType === Node.ELEMENT_NODE) {
-      acc.push(
-        isTextNode
-          ? node.nodeValue
-          : renderElement(key, node as Element, options)
-      );
-    }
-
-    return acc;
-  }, []);
+): ReactNode[] {
+  return Array.from(nodeList).reduce<ReactNode[]>(
+    (acc, node, key) => (acc.push(renderNode(node, key, options)), acc),
+    []
+  );
 }

@@ -1,6 +1,6 @@
 import React from "react";
 import { render } from "@testing-library/react";
-import parse from "../src";
+import { parse } from "../src";
 
 describe("parse", () => {
   it("should be defined and function", () => {

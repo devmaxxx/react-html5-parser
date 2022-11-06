@@ -1,7 +1,8 @@
 {
   "name": "react-html5-parser",
   "version": "0.0.1",
-  "description": "Parse html into react",
+  "sideEffects": false,
+  "description": "Parse html string into react nodes",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.esm.js",
@@ -25,13 +26,13 @@
     "package.json"
   ],
   "scripts": {
-    "dev": "microbundle watch src/*.ts --no-sourcemap --no-compress --generateTypes false --external react",
+    "dev": "microbundle watch src/*.ts --no-sourcemap --no-compress --generateTypes false",
     "size-check": "filesize",
     "clean": "rimraf dist",
-    "build:lib": "microbundle src/*.ts --external react",
-    "build:debug": "npm run build:lib -- -o debug --no-compress",
+    "build:lib": "microbundle src/*.ts --external react --globals react=React",
+    "build:debug": "npm run build:lib -- -o build --no-compress",
     "build": "npm run clean && npm run build:lib",
-    "build:size": "npm run build && npm run size-check",
+    "build:size": "npm run build&& npm run size-check",
     "test": "jest",
     "test:watch": "jest --watchAll"
   },
@@ -59,6 +60,9 @@
   "dependencies": {
     "dompurify": "^2.4.0"
   },
+  "peerDependencies": {
+    "react": ">= 16.8.0"
+  },
   "engines": {
     "node": ">=14.16"
   },
@@ -80,10 +84,10 @@
       "gzip": "10 kB"
     },
     "./dist/pure.modern.js": {
-      "gzip": "2 kB"
+      "gzip": "2.1 kB"
     },
     "./dist/pure.cjs": {
-      "gzip": "2 kB"
+      "gzip": "2.1 kB"
     }
   }
 }
