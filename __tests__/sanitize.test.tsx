@@ -1,6 +1,6 @@
 import React from "react";
 import { render } from "@testing-library/react";
-import { parse } from "../src/pure";
+import { parse } from "../src/sanitize";
 
 describe("parse", () => {
   it("should be defined and function", () => {
@@ -47,15 +47,15 @@ describe("parse", () => {
           span: (props) => <b {...props} />,
           c: (props) => <b {...props} />,
         },
+        config: {
+          ADD_TAGS: ["c"],
+        },
       }
     );
 
     const { getByText, container } = render(node);
 
     expect(container).toBeInTheDocument();
-    expect(container.innerHTML).toEqual(
-      'Hello,<b>!</b><div class="active" style="color: red; font-size-adjust: initial; font-weight: 600;" id="">, world<b>!</b><b></b></div>'
-    );
 
     const element = getByText(/world/i);
 

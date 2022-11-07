@@ -22,6 +22,6 @@ export type RenderOptions = {
   mapElement?: MapElementFn;
 };
 
-export type PureParseOptions = RenderOptions & {
+export type ParseOptions = RenderOptions & {
   sanitize?: (html: string) => string;
 };

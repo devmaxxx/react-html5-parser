@@ -1,7 +1,7 @@
 {
   "name": "react-html5-parser",
   "amdName": "ReactHTMLParser",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "sideEffects": false,
   "description": "Parse HTML string into React nodes",
   "type": "module",
@@ -18,12 +18,12 @@
       "import": "./dist/index.mjs",
       "umd": "./dist/index.umd.js"
     },
-    "./pure": {
-      "types": "./dist/pure.d.ts",
-      "browser": "./dist/pure.module.js",
-      "require": "./dist/pure.cjs",
-      "import": "./dist/pure.mjs",
-      "umd": "./dist/pure.umd.js"
+    "./sanitize": {
+      "types": "./dist/sanitize.d.ts",
+      "browser": "./dist/sanitize.module.js",
+      "require": "./dist/sanitize.cjs",
+      "import": "./dist/sanitize.mjs",
+      "umd": "./dist/sanitize.umd.js"
     }
   },
   "files": [
@@ -40,8 +40,9 @@
     "build:debug": "npm run build:lib -- -o build --no-compress",
     "build": "npm run clean && npm run build:lib",
     "build:size": "npm run build && npm run size-check",
-    "test": "jest",
-    "test:watch": "jest --watchAll"
+    "test": "jest && npm run size-check",
+    "test:watch": "jest --watchAll",
+    "release": "npm run test && npm run build && git tag $npm_package_version && git push && git push --tags && npm publish"
   },
   "author": "devmaxxx",
   "license": "MIT",
@@ -101,16 +102,16 @@
   },
   "filesize": {
     "./dist/index.mjs": {
-      "gzip": "10 kB"
+      "gzip": "2.1 kB"
     },
     "./dist/index.cjs": {
+      "gzip": "2.1 kB"
+    },
+    "./dist/sanitize.mjs": {
       "gzip": "10 kB"
     },
-    "./dist/pure.mjs": {
-      "gzip": "2.1 kB"
-    },
-    "./dist/pure.cjs": {
-      "gzip": "2.1 kB"
+    "./dist/sanitize.cjs": {
+      "gzip": "10 kB"
     }
   }
 }

@@ -47,9 +47,6 @@ describe("parse", () => {
           span: (props) => <b {...props} />,
           c: (props) => <b {...props} />,
         },
-        domConfig: {
-          ADD_TAGS: ["c"],
-        },
       }
     );
 

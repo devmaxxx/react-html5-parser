@@ -1,16 +1,20 @@
-import Dom from "dompurify";
-import { PureParseOptions } from "./core/types";
-import { parse as pureParse, renderNode, renderNodes } from "./pure";
+import { createElement, Fragment } from "react";
+import { identity } from "./core/utils";
+import { renderNodes, renderNode } from "./core/render";
+import { ParseOptions } from "./core/types";
 
-type Options = PureParseOptions & {
-  domConfig?: Omit<Dom.Config, "RETURN_DOM" | "RETURN_DOM_FRAGMENT">;
-};
+function parse(html: string, options: ParseOptions = {}) {
+  if (!(typeof html === "string" && html)) return createElement(Fragment);
 
-function parse(html: string, options: Options = {}) {
-  return pureParse(html, {
-    sanitize: (str) => Dom.sanitize(str, options.domConfig || {}),
-    ...options,
-  });
+  const sanitize = options.sanitize || identity;
+  const template = document.createElement("template");
+  template.innerHTML = sanitize(html);
+
+  return createElement(
+    Fragment,
+    {},
+    renderNodes(template.content.childNodes, options)
+  );
 }
 
-export { parse, renderNode, renderNodes };
+export { parse, renderNodes, renderNode };
