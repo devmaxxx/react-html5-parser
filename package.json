@@ -1,22 +1,25 @@
 {
   "name": "react-html5-parser",
+  "amdName": "ReactHTMLParser",
   "version": "0.0.1",
   "sideEffects": false,
-  "description": "Parse html string into react nodes",
+  "description": "Parse HTML string into React nodes",
   "type": "module",
   "main": "./dist/index.cjs",
-  "module": "./dist/index.esm.js",
+  "module": "./dist/index.module.js",
   "umd:main": "./dist/index.umd.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "require": "./dist/index.cjs",
-      "import": "./dist/index.modern.js",
+      "import": "./dist/index.mjs",
       "umd": "./dist/index.umd.js"
     },
     "./pure": {
+      "types": "./dist/pure.d.ts",
       "require": "./dist/pure.cjs",
-      "import": "./dist/pure.modern.js",
+      "import": "./dist/pure.mjs",
       "umd": "./dist/pure.umd.js"
     }
   },
@@ -32,7 +35,7 @@
     "build:lib": "microbundle src/*.ts --external react --globals react=React",
     "build:debug": "npm run build:lib -- -o build --no-compress",
     "build": "npm run clean && npm run build:lib",
-    "build:size": "npm run build&& npm run size-check",
+    "build:size": "npm run build && npm run size-check",
     "test": "jest",
     "test:watch": "jest --watchAll"
   },
@@ -77,13 +80,13 @@
     "testEnvironment": "jsdom"
   },
   "filesize": {
-    "./dist/index.modern.js": {
+    "./dist/index.mjs": {
       "gzip": "10 kB"
     },
     "./dist/index.cjs": {
       "gzip": "10 kB"
     },
-    "./dist/pure.modern.js": {
+    "./dist/pure.mjs": {
       "gzip": "2.1 kB"
     },
     "./dist/pure.cjs": {
