@@ -8,16 +8,19 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.module.js",
   "umd:main": "./dist/index.umd.js",
+  "unpkg": "./dist/index.umd.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
+      "browser": "./dist/index.module.js",
       "require": "./dist/index.cjs",
       "import": "./dist/index.mjs",
       "umd": "./dist/index.umd.js"
     },
     "./pure": {
       "types": "./dist/pure.d.ts",
+      "browser": "./dist/pure.module.js",
       "require": "./dist/pure.cjs",
       "import": "./dist/pure.mjs",
       "umd": "./dist/pure.umd.js"
@@ -26,6 +29,7 @@
   "files": [
     "src",
     "dist",
+    "README.md",
     "package.json"
   ],
   "scripts": {
@@ -41,6 +45,22 @@
   },
   "author": "devmaxxx",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/devmaxxx/react-html5-parser"
+  },
+  "bugs": {
+    "url": "https://github.com/devmaxxx/react-html5-parser/issues"
+  },
+  "keywords": [
+    "html",
+    "parser",
+    "react",
+    "react-html",
+    "react-html-parser",
+    "html-react-parser",
+    "html-parser"
+  ],
   "devDependencies": {
     "@ampproject/filesize": "^4.3.0",
     "@testing-library/jest-dom": "^5.16.5",
