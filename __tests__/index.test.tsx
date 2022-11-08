@@ -50,6 +50,9 @@ describe("parse", () => {
         mapElement: (element) => {
           return element;
         },
+        attrsMap: {
+          hello: "world",
+        },
       }
     );
 

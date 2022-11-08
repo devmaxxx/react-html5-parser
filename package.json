@@ -10,22 +10,6 @@
   "umd:main": "./dist/index.umd.js",
   "unpkg": "./dist/index.umd.js",
   "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "browser": "./dist/index.module.js",
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.mjs",
-      "umd": "./dist/index.umd.js"
-    },
-    "./sanitize": {
-      "types": "./dist/sanitize.d.ts",
-      "browser": "./dist/sanitize.module.js",
-      "require": "./dist/sanitize.cjs",
-      "import": "./dist/sanitize.mjs",
-      "umd": "./dist/sanitize.umd.js"
-    }
-  },
   "files": [
     "src",
     "dist",
@@ -33,10 +17,11 @@
     "package.json"
   ],
   "scripts": {
+    "install": "npm run build",
     "dev": "microbundle watch src/*.ts --no-sourcemap --no-compress --generateTypes false",
     "size-check": "filesize",
     "clean": "rimraf dist",
-    "build:lib": "microbundle src/*.ts --external react --globals react=React",
+    "build:lib": "microbundle --external react --globals react=React",
     "build:debug": "npm run build:lib -- -o build --no-compress",
     "build": "npm run clean && npm run build:lib",
     "build:size": "npm run build && npm run size-check",
@@ -66,7 +51,6 @@
     "@ampproject/filesize": "^4.3.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
-    "@types/dompurify": "^2.3.4",
     "@types/jest": "^29.2.0",
     "@types/react": "^18.0.22",
     "@types/react-dom": "^18.0.7",
@@ -80,9 +64,6 @@
     "rimraf": "^3.0.2",
     "ts-jest": "^29.0.3",
     "typescript": "^4.8.4"
-  },
-  "dependencies": {
-    "dompurify": "^2.4.0"
   },
   "peerDependencies": {
     "react": ">= 16.8.0"
@@ -106,12 +87,6 @@
     },
     "./dist/index.cjs": {
       "gzip": "2.1 kB"
-    },
-    "./dist/sanitize.mjs": {
-      "gzip": "10 kB"
-    },
-    "./dist/sanitize.cjs": {
-      "gzip": "10 kB"
     }
   }
 }

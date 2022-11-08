@@ -1,12 +1,12 @@
-import { ReactNode, createElement, cloneElement, isValidElement } from "react";
+import { ReactNode, createElement, isValidElement } from "react";
 import { identity } from "./utils";
 import { attrsToProps } from "./attributes";
-import { RenderOptions } from "./types";
+import { RenderOptions, Key } from "./types";
 
 export function renderNode(
   node: Node,
-  key: number,
-  options: RenderOptions
+  key?: Key,
+  options: RenderOptions = {}
 ): ReactNode {
   const { mapNode, mapElement, components } = options;
   const _mapNode = mapNode || identity;
@@ -27,23 +27,26 @@ export function renderNode(
     const _nodeName = nodeName.toLowerCase();
     const children = childNodes.length
       ? renderNodes(childNodes, options)
-      : undefined;
-    const props = Object.assign({ key, children }, attrsToProps(attributes));
+      : null;
+    const props = Object.assign(
+      { key, children },
+      attrsToProps(attributes, options.attrsMap)
+    );
     const mapComponent = components?.[_nodeName];
 
-    const element = mapComponent
+    const reactNode = mapComponent
       ? mapComponent(props)
       : createElement(_nodeName, props);
 
-    return mapElement && isValidElement(element)
-      ? mapElement(element)
-      : element;
+    return mapElement && isValidElement(reactNode)
+      ? mapElement(reactNode)
+      : reactNode;
   }
 }
 
 export function renderNodes(
   nodeList: NodeListOf<Node>,
-  options: RenderOptions
+  options?: RenderOptions
 ): ReactNode[] {
   return Array.from(nodeList).reduce<ReactNode[]>(
     (acc, node, key) => (acc.push(renderNode(node, key, options)), acc),

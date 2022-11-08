@@ -1,14 +1,16 @@
-import { attributesMap } from "../src/core/attributes";
+import { htmlAttrsMap, svgAttrsMap } from "../src/core/attributes";
 import { possibleStandardNames } from "./possibleStandardNames";
 
 describe("#attributes", () => {
   it("should support all html attributes", () => {
+    // react only keys
     const excludeKeys = [
       "classname",
       "htmlfor",
       "dangerouslysetinnerhtml",
       "innerhtml",
     ];
+
     const includeKeys = ["panose1", "panose-1"];
 
     // ignore prop with the same key value except "panose1"
@@ -26,6 +28,11 @@ describe("#attributes", () => {
       {}
     );
 
-    expect(htmlAttrs).toEqual(attributesMap);
+    const allAttributes = {
+      ...htmlAttrsMap,
+      ...svgAttrsMap,
+    };
+
+    expect(htmlAttrs).toEqual(allAttributes);
   });
 });
