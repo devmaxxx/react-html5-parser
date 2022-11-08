@@ -1,4 +1,9 @@
-import { AllHTMLAttributes, PropsWithChildren, ReactNode } from "react";
+import {
+  AllHTMLAttributes,
+  PropsWithChildren,
+  ReactElement,
+  ReactNode,
+} from "react";
 
 export type Key = number | string;
 export type Attributes = AllHTMLAttributes<Element>;
@@ -9,19 +14,16 @@ export type MapNodeFn = (
   key: Key,
   options: RenderOptions
 ) => Node | ReactNode;
-export type MapElementFn = (
-  props: PropsWithChildren<Attributes & { key: Key }>,
-  nodeName: string,
-  options: RenderOptions
+export type MapElementFn = (element: ReactElement) => ReactNode;
+export type MapComponentFn = (
+  props: PropsWithChildren<Attributes & { key: Key }>
 ) => ReactNode;
-export type Components = Record<string, MapElementFn>;
-
+export type Components = Record<string, MapComponentFn>;
 export type RenderOptions = {
   components?: Partial<Components>;
   mapNode?: MapNodeFn;
   mapElement?: MapElementFn;
 };
-
 export type ParseOptions = RenderOptions & {
   sanitize?: (html: string) => string;
 };

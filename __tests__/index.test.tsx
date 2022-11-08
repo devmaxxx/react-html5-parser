@@ -47,6 +47,9 @@ describe("parse", () => {
           span: (props) => <b {...props} />,
           c: (props) => <b {...props} />,
         },
+        mapElement: (element) => {
+          return element;
+        },
       }
     );
 

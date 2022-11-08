@@ -3,7 +3,7 @@
   "amdName": "ReactHTMLParser",
   "version": "0.1.0",
   "sideEffects": false,
-  "description": "Parse HTML string into React nodes",
+  "description": "Fast and small (2kb) HTML to React parser in browser",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.module.js",

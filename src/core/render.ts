@@ -1,4 +1,4 @@
-import { ReactNode, createElement } from "react";
+import { ReactNode, createElement, cloneElement, isValidElement } from "react";
 import { identity } from "./utils";
 import { attrsToProps } from "./attributes";
 import { RenderOptions } from "./types";
@@ -29,11 +29,15 @@ export function renderNode(
       ? renderNodes(childNodes, options)
       : undefined;
     const props = Object.assign({ key, children }, attrsToProps(attributes));
-    const renderElement = (components && components[_nodeName]) || mapElement;
+    const mapComponent = components?.[_nodeName];
 
-    return renderElement
-      ? renderElement(props, _nodeName, options)
+    const element = mapComponent
+      ? mapComponent(props)
       : createElement(_nodeName, props);
+
+    return mapElement && isValidElement(element)
+      ? mapElement(element)
+      : element;
   }
 }
 
