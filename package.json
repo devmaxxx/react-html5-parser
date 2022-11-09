@@ -5,10 +5,12 @@
   "sideEffects": false,
   "description": "Fast and small (2kb) HTML to React parser in browser",
   "type": "module",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.module.js",
+  "source": "./src/index.ts",
+  "main": "./dist/index.js",
   "umd:main": "./dist/index.umd.js",
   "unpkg": "./dist/index.umd.js",
+  "module": "./dist/index.module.mjs",
+  "exports": "./dist/index.modern.mjs",
   "types": "./dist/index.d.ts",
   "files": [
     "src",
@@ -85,12 +87,12 @@
   },
   "size-limit": [
     {
-      "path": "./dist/index.{module,modern}.js",
+      "path": "./dist/index.{module,modern}.mjs",
       "import": "{ parse }",
       "limit": "1.2 kB"
     },
     {
-      "path": "./dist/index.{module,modern}.js",
+      "path": "./dist/index.{module,modern}.mjs",
       "import": "{ parse, parseAttrs, SVG_ATTRIBUTES }",
       "limit": "2.1 kB"
     },
