@@ -1,4 +1,5 @@
-import { htmlAttrsMap, svgAttrsMap } from "../src/core/attributes";
+import { SVG_ATTRIBUTES } from "../src/core/constants";
+import { htmlAttrsMap, parseAttrs } from "../src/core/attributes";
 import { possibleStandardNames } from "./possibleStandardNames";
 
 describe("#attributes", () => {
@@ -27,6 +28,8 @@ describe("#attributes", () => {
       },
       {}
     );
+
+    const svgAttrsMap = parseAttrs(SVG_ATTRIBUTES);
 
     const allAttributes = {
       ...htmlAttrsMap,

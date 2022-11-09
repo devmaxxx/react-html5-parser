@@ -2,7 +2,6 @@ import {
   STYLE_COMMENTS_REGEX,
   STYLE_RULES_REGEX,
   HTML_ATTRIBUTES,
-  SVG_ATTRIBUTES,
 } from "./constants";
 import { camelCase } from "./utils";
 import {
@@ -12,10 +11,9 @@ import {
   AtributesPropKeys,
 } from "./types";
 
-export const htmlAttrsMap = parseAttrsMap(HTML_ATTRIBUTES);
-export const svgAttrsMap = parseAttrsMap(SVG_ATTRIBUTES);
+export const htmlAttrsMap = parseAttrs(HTML_ATTRIBUTES);
 
-export function parseAttrsMap(attrs: string): AttributesMap {
+export function parseAttrs(attrs: string): AttributesMap {
   return attrs.split(" ").reduce<AttributesMap>(
     (acc, prop) => {
       const value = camelCase(prop) as AtributesPropKeys;
@@ -55,18 +53,20 @@ export function attrsToProps(
   attrs: NamedNodeMap,
   attrsMap: AttributesMap = {}
 ): Attributes {
-  return Array.from(attrs).reduce<Attributes>((acc, attr) => {
-    const nodeName = attr.nodeName;
-    const nodeValue = attr.nodeValue || "";
-    const attrKey = Object.assign(htmlAttrsMap, attrsMap)[nodeName] || nodeName;
+  return Array.from(attrs).reduce<Attributes>(
+    (acc, { nodeName, nodeValue }) => {
+      const attrKey =
+        Object.assign(htmlAttrsMap, attrsMap)[nodeName] || nodeName;
 
-    acc[attrKey] =
-      attrKey == "style"
-        ? nodeValue
-          ? styleToObject(nodeValue)
-          : {}
-        : nodeValue;
+      acc[attrKey] =
+        attrKey == "style"
+          ? nodeValue
+            ? styleToObject(nodeValue)
+            : {}
+          : nodeValue || "";
 
-    return acc;
-  }, {});
+      return acc;
+    },
+    {}
+  );
 }

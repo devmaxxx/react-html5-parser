@@ -18,16 +18,16 @@
   ],
   "scripts": {
     "install": "npm run build",
-    "dev": "microbundle watch src/*.ts --no-sourcemap --no-compress --generateTypes false",
-    "size-check": "filesize",
+    "dev": "microbundle watch --no-sourcemap --no-compress --generateTypes false",
+    "sizecheck": "size-limit",
     "clean": "rimraf dist",
     "build:lib": "microbundle --external react --globals react=React",
     "build:debug": "npm run build:lib -- -o build --no-compress",
     "build": "npm run clean && npm run build:lib",
-    "build:size": "npm run build && npm run size-check",
-    "test": "jest && npm run size-check",
+    "build:size": "npm run build && npm run sizecheck",
+    "test": "jest",
     "test:watch": "jest --watchAll",
-    "release": "npm run test && npm run build && git tag $npm_package_version && git push && git push --tags && npm publish"
+    "release": "npm run test && npm run build:size && git tag $npm_package_version && git push && git push --tags && npm publish"
   },
   "author": "devmaxxx",
   "license": "MIT",
@@ -48,7 +48,8 @@
     "html-parser"
   ],
   "devDependencies": {
-    "@ampproject/filesize": "^4.3.0",
+    "@size-limit/esbuild": "^8.1.0",
+    "@size-limit/file": "^8.1.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@types/jest": "^29.2.0",
@@ -62,6 +63,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "rimraf": "^3.0.2",
+    "size-limit": "^8.1.0",
     "ts-jest": "^29.0.3",
     "typescript": "^4.8.4"
   },
@@ -81,12 +83,24 @@
     ],
     "testEnvironment": "jsdom"
   },
-  "filesize": {
-    "./dist/index.mjs": {
-      "gzip": "2.1 kB"
+  "size-limit": [
+    {
+      "path": "./dist/index.{module,modern}.js",
+      "import": "{ parse }",
+      "limit": "1.2 kB"
     },
-    "./dist/index.cjs": {
-      "gzip": "2.1 kB"
+    {
+      "path": "./dist/index.{module,modern}.js",
+      "import": "{ parse, parseAttrs, SVG_ATTRIBUTES }",
+      "limit": "2.1 kB"
+    },
+    {
+      "path": "./dist/index.cjs",
+      "limit": "2.4 kB"
+    },
+    {
+      "path": "./dist/index.umd.js",
+      "limit": "2.4 kB"
     }
-  }
+  ]
 }

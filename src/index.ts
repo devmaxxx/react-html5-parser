@@ -1,7 +1,8 @@
 import { createElement, Fragment } from "react";
+import { SVG_ATTRIBUTES } from "./core/constants";
 import { identity } from "./core/utils";
-import { svgAttrsMap } from "./core/attributes";
-import { renderNodes, renderNode } from "./core/render";
+import { renderNode, renderNodes } from "./core/render";
+import { parseAttrs } from "./core/attributes";
 import { ParseOptions } from "./core/types";
 
 function parse(html: string, options: ParseOptions = {}) {
@@ -19,4 +20,4 @@ function parse(html: string, options: ParseOptions = {}) {
 }
 
 export * from "./core/types";
-export { svgAttrsMap, renderNodes, renderNode, parse };
+export { parse, parseAttrs, renderNodes, renderNode, SVG_ATTRIBUTES };
