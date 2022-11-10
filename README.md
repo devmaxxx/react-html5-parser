@@ -1,5 +1,9 @@
 # react-html5-parser
 
+Fast and small (2kb) HTML to React parser in browser
+
+### Work still in progress
+
 ## Install
 
 ```sh
@@ -10,10 +14,13 @@ yarn add react-html5-parser
 
 ## Use
 
+## To read
+
+- parse only html attributes (1.1kb) (default)
+- parse html and svg attributes (2kb) (need to update [attrsMap](#attrsMap))
+
 ```ts
 import { parse } from "react-html5-parser";
-// or
-import { parse } from "react-html5-parser/sanitize";
 
 // Parse element
 parse("<div>Lorem ipsum</div>");
@@ -36,6 +43,7 @@ parse("Lorem <div>ipsum</div>");
   - `components` (`object?`): Override React elements. The keys are HTML equivalents (such as `div`)
   - `mapNode` (`function?`): Override Dom node
   - `mapElement` (`function?`): Override React element. Сalled after `components` override
+  - `attrsMap` (`object?`): Map for converting dom attributes to react attributes
 
 #### Return
 
@@ -45,13 +53,15 @@ Return `React.Fragment` with React nodes or empty, if `html` is not/empty `strin
 
 ```ts
 import { parse } from "react-html5-parser";
-import xss from "xss";
+import dompurify from "dompurify";
 
 // trim string
 parse("<div>Lorem ipsum</div>", { sanitize: (html: string) => html.trim() });
 
-// sanitize with xss
-parse("<div>Lorem ipsum</div>", { sanitize: xss });
+// sanitize with dompurify
+parse("<div>Lorem ipsum</div>", {
+  sanitize: (html: string) => dompurify.sanitize(html),
+});
 ```
 
 ### components `{ [key: string]: (props: {}) => ReactNode }`
@@ -85,6 +95,9 @@ import { parse, renderNode, renderNodes } from "react-html5-parser";
 
 parse("<div>Lorem <b>ipsum</b></div>", {
   mapNode: (node: Node, key: string | number, options = {}) => {
+    // return renderNode(node); // render node as react node
+    // return renderNodes(node.childNodes); // render only childNodes
+
     return node;
   },
 });
@@ -101,5 +114,21 @@ parse("<div>Lorem <b>ipsum</b></div>", {
 
     return element;
   },
+});
+```
+
+### attrsMap `{ [key: string]: string }`
+
+```ts
+import { parse, parseAttrs, SVG_ATTRIBUTES } from "react-html5-parser";
+
+// need for the correct parsing svg attributes
+const svgAttrsMap = parseAttrs(SVG_ATTRIBUTES);
+
+// map custom attrs, convert classname to class
+const customMap = { classname: "class" };
+
+parse("<div>Lorem <b>ipsum</b></div>", {
+  attrsMap: { ...svgAttrsMap, ...customMap },
 });
 ```
