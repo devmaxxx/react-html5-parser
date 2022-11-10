@@ -17,7 +17,7 @@ yarn add react-html5-parser
 ## To read
 
 - parse only html attributes (1.1kb) (default)
-- parse html and svg attributes (2kb) (need to update [attrsMap](#attrsMap))
+- parse html and svg attributes (2kb) (need to update [attrsMap](#attrsMap) option)
 
 ```ts
 import { parse } from "react-html5-parser";

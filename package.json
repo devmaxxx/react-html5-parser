@@ -1,7 +1,7 @@
 {
   "name": "react-html5-parser",
   "amdName": "ReactHTMLParser",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "sideEffects": false,
   "description": "Fast and small (2kb) HTML to React parser in browser",
   "type": "module",
@@ -19,7 +19,6 @@
     "package.json"
   ],
   "scripts": {
-    "install": "npm run build",
     "dev": "microbundle watch --no-sourcemap --no-compress --generateTypes false",
     "sizecheck": "size-limit",
     "clean": "rimraf dist",
