@@ -45,7 +45,7 @@ export function renderNode(
 }
 
 export function renderNodes(
-  nodeList: NodeListOf<Node>,
+  nodeList: NodeListOf<Node> | Node[],
   options?: RenderOptions
 ): ReactNode[] {
   return Array.from(nodeList).reduce<ReactNode[]>(

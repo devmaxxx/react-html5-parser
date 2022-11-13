@@ -9,14 +9,14 @@ function parse(html: string, options: ParseOptions = {}) {
   if (!(typeof html === "string" && html)) return createElement(Fragment);
 
   const sanitize = options.sanitize || identity;
-  const template = document.createElement("template");
-  template.innerHTML = sanitize(html);
+  const container = document.createElement("div");
+  container.innerHTML = sanitize(html);
 
-  return createElement(
-    Fragment,
-    {},
-    renderNodes(template.content.childNodes, options)
-  );
+  const nodeList: Node[] = [];
+
+  container.childNodes.forEach((item) => nodeList.push(item));
+
+  return createElement(Fragment, {}, renderNodes(nodeList, options));
 }
 
 export * from "./core/types";

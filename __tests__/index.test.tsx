@@ -56,8 +56,11 @@ describe("parse", () => {
       }
     );
 
-    const { getByText } = render(node);
+    const { getByText, container } = render(node);
 
+    expect(container.innerHTML).toBe(
+      'Hello,<b>!</b><div class="active" style="color: red; font-size-adjust: initial; font-weight: 600;" id="">, world<b>!</b><b></b></div>'
+    );
     const element = getByText(/world/i);
 
     expect(element).toBeInTheDocument();
