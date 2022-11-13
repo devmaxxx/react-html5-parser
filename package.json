@@ -3,7 +3,7 @@
   "amdName": "ReactHTMLParser",
   "version": "0.1.2",
   "sideEffects": false,
-  "description": "Fast and small (2kb) HTML to React parser in browser",
+  "description": "Fast, simple and small (2kb) HTML to React parser in browser",
   "type": "module",
   "source": "./src/index.ts",
   "main": "./dist/index.js",

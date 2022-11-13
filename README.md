@@ -1,6 +1,6 @@
 # react-html5-parser
 
-Fast and small (2kb) HTML to React parser in browser
+Fast, simple and small (2kb) HTML to React parser in browser
 
 ### Work still in progress
 
