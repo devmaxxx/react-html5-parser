@@ -2,8 +2,9 @@ import {
   STYLE_COMMENTS_REGEX,
   STYLE_RULES_REGEX,
   HTML_ATTRIBUTES,
+  BOOL_HTML_ATTRIBUTES,
 } from "./constants";
-import { camelCase } from "./utils";
+import { camelCase, boolAttrValue } from "./utils";
 import {
   AttributesMap,
   CSSProperties,
@@ -11,26 +12,27 @@ import {
   AtributesPropKeys,
 } from "./types";
 
-export const htmlAttrsMap = parseAttrs(HTML_ATTRIBUTES);
+export const htmlAttrsMap = parseAttrs(HTML_ATTRIBUTES, {
+  class: "className",
+  for: "htmlFor",
+});
+export const boolHtmlAttrsMap = parseAttrs(BOOL_HTML_ATTRIBUTES);
 
-export function parseAttrs(attrs: string): AttributesMap {
-  return attrs.split(" ").reduce<AttributesMap>(
-    (acc, prop) => {
-      const value = camelCase(prop) as AtributesPropKeys;
+export function parseAttrs(
+  attrs: string,
+  initialValue?: AttributesMap
+): AttributesMap {
+  return attrs.split(" ").reduce<AttributesMap>((acc, prop) => {
+    const value = camelCase(prop) as AtributesPropKeys;
 
-      acc[prop.toLowerCase()] = value;
+    acc[prop.toLowerCase()] = value;
 
-      if (prop.match(/[-:]/)) {
-        acc[value.toLowerCase()] = value;
-      }
-
-      return acc;
-    },
-    {
-      class: "className",
-      for: "htmlFor",
+    if (prop.match(/[-:]/)) {
+      acc[value.toLowerCase()] = value;
     }
-  );
+
+    return acc;
+  }, initialValue || {});
 }
 
 export function styleToObject(style: string): CSSProperties {
@@ -43,27 +45,33 @@ export function styleToObject(style: string): CSSProperties {
     const value = arr[2];
     const rule = key[0] == "-" ? key : camelCase(key);
 
-    rules[rule] = Number.isNaN(+value) ? value : +value;
+    rules[rule] = value;
   }
 
   return rules;
 }
 
 export function attrsToProps(
-  attrs: NamedNodeMap,
-  attrsMap: AttributesMap = {}
+  node: Element,
+  attrsMap: AttributesMap
 ): Attributes {
-  return Array.from(attrs).reduce<Attributes>(
+  return Array.from(node.attributes).reduce<Attributes>(
     (acc, { nodeName, nodeValue }) => {
+      const defaultAttrValue = nodeValue || "";
       const attrKey =
-        Object.assign(htmlAttrsMap, attrsMap)[nodeName] || nodeName;
+        !["reset", "submit"].includes(node.getAttribute("type") || "") &&
+        ["checked", "value"].includes(nodeName)
+          ? camelCase("default-" + nodeName)
+          : attrsMap[nodeName] || nodeName;
 
       acc[attrKey] =
         attrKey == "style"
-          ? nodeValue
-            ? styleToObject(nodeValue)
+          ? defaultAttrValue
+            ? styleToObject(defaultAttrValue)
             : {}
-          : nodeValue || "";
+          : boolHtmlAttrsMap[nodeName]
+          ? boolAttrValue(nodeValue, nodeName)
+          : defaultAttrValue;
 
       return acc;
     },

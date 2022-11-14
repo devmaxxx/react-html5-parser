@@ -5,3 +5,7 @@ export function camelCase(value: string) {
 export function identity<T>(value: T): T {
   return value;
 }
+
+export function boolAttrValue(value: unknown, nodeName?: string) {
+  return !value || (nodeName == "download" ? value : !!value);
+}

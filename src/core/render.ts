@@ -1,6 +1,6 @@
 import { ReactNode, createElement, isValidElement } from "react";
 import { identity } from "./utils";
-import { attrsToProps } from "./attributes";
+import { attrsToProps, boolHtmlAttrsMap, htmlAttrsMap } from "./attributes";
 import { RenderOptions, Key } from "./types";
 
 export function renderNode(
@@ -23,14 +23,17 @@ export function renderNode(
   }
 
   if (nodeType === 1) {
-    const { childNodes, nodeName, attributes } = _node as Element;
+    const { childNodes, nodeName } = _node as Element;
     const _nodeName = nodeName.toLowerCase();
     const children = childNodes.length
       ? renderNodes(childNodes, options)
       : null;
     const props = Object.assign(
       { key, children },
-      attrsToProps(attributes, options.attrsMap)
+      attrsToProps(
+        _node as Element,
+        Object.assign({}, htmlAttrsMap, boolHtmlAttrsMap, options.attrsMap)
+      )
     );
     const mapComponent = components?.[_nodeName];
 

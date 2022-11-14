@@ -41,7 +41,7 @@ describe("parse", () => {
 
   it("should parse components", () => {
     const node = parse(
-      "Hello,<c>!</c><div class='active' style='color: red; font-size-adjust: initial; font-weight: 600' id>, world<span style>!</span><b></b></div>",
+      `Hello,<c>!</c><div class='active' style='color: red; font-size-adjust: initial; font-weight: 600' id>, world<span style>!</span><b></b></div><input type='text' value="Submit">`,
       {
         components: {
           span: (props) => <b {...props} />,
@@ -58,8 +58,8 @@ describe("parse", () => {
 
     const { getByText, container } = render(node);
 
-    expect(container.innerHTML).toBe(
-      'Hello,<b>!</b><div class="active" style="color: red; font-size-adjust: initial; font-weight: 600;" id="">, world<b>!</b><b></b></div>'
+    expect(container.innerHTML).toMatchInlineSnapshot(
+      `"Hello,<b>!</b><div class="active" style="color: red; font-size-adjust: initial; font-weight: 600;" id="">, world<b>!</b><b></b></div><input type="text" value="Submit">"`
     );
     const element = getByText(/world/i);
 
