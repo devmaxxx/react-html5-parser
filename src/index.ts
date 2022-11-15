@@ -1,22 +1,38 @@
 import { createElement, Fragment } from "react";
 import { SVG_ATTRIBUTES } from "./core/constants";
 import { identity } from "./core/utils";
-import { renderNode, renderNodes } from "./core/render";
+import { renderNode, renderNodes, getNodeList } from "./core/render";
 import { parseAttrs } from "./core/attributes";
 import { ParseOptions } from "./core/types";
 
+const emptyFragment = createElement(Fragment);
+const typeErrorMessage = "HTML must be a string";
+
+function checkTypeError(html: unknown, message: string) {
+  if (typeof html !== "string") {
+    throw new TypeError(message);
+  }
+}
+
 function parse(html: string, options: ParseOptions = {}) {
-  if (!(typeof html === "string" && html)) return createElement(Fragment);
+  try {
+    checkTypeError(html, typeErrorMessage);
 
-  const sanitize = options.sanitize || identity;
-  const container = document.createElement("div");
-  container.innerHTML = sanitize(html);
+    html = (options.sanitize || identity)(html);
 
-  const nodeList: Node[] = [];
+    checkTypeError(html, "Sanitized " + typeErrorMessage);
 
-  container.childNodes.forEach((item) => nodeList.push(item));
+    if (html)
+      return createElement(
+        Fragment,
+        {},
+        renderNodes(getNodeList(html), options)
+      );
+  } catch (error) {
+    (options.onError || identity)(error);
+  }
 
-  return createElement(Fragment, {}, renderNodes(nodeList, options));
+  return emptyFragment;
 }
 
 export * from "./core/types";

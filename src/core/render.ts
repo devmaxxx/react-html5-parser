@@ -3,6 +3,17 @@ import { identity } from "./utils";
 import { attrsToProps, boolHtmlAttrsMap, htmlAttrsMap } from "./attributes";
 import { RenderOptions, Key } from "./types";
 
+export function getNodeList(html: string, _container?: HTMLElement) {
+  try {
+    _container = new DOMParser().parseFromString(html, "text/html").body;
+  } catch (_) {
+    _container = document.createElement("div");
+    _container.innerHTML = html;
+  }
+
+  return _container.childNodes;
+}
+
 export function renderNode(
   node: Node,
   key?: Key,

@@ -28,18 +28,34 @@ describe("parse", () => {
     expect(container).toBeVisible();
   });
 
-  it("should return fragment for anything except string", () => {
+  it("should return empty fragment and invoke onError if we got not a string", () => {
+    const onError = jest.fn();
+
     //@ts-ignore
-    const node = parse(null);
+    const node = parse(null, { onError });
 
+    expect(onError).toBeCalled();
+    expect(onError).toBeCalledWith(new TypeError("HTML must be a string"));
     expect(node).toStrictEqual(<></>);
+  });
 
-    const { container } = render(node);
+  it("should return empty fragment and invoke onError if we got not a string after sanitize", () => {
+    const onError = jest.fn();
+    const sanitize = jest.fn((_: string) => null);
 
-    expect(container).toBeVisible();
+    //@ts-ignore
+    const node = parse("<div></div>", { onError, sanitize });
+
+    expect(onError).toBeCalled();
+    expect(onError).toBeCalledWith(
+      new TypeError("Sanitized HTML must be a string")
+    );
+    expect(node).toStrictEqual(<></>);
   });
 
   it("should parse components", () => {
+    global.DOMParser = jest.fn().mockImplementationOnce(() => {});
+
     const node = parse(
       `Hello,<c>!</c><div class='active' style='color: red; font-size-adjust: initial; font-weight: 600' id>, world<span style>!</span><b></b></div><input type='text' value="Submit">`,
       {
