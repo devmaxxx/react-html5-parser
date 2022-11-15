@@ -36,11 +36,11 @@ export function parseAttrs(
 }
 
 export function styleToObject(style: string): CSSProperties {
-  const filteredStyle = style.replace(STYLE_COMMENTS_REGEX, "");
+  style = style.replace(STYLE_COMMENTS_REGEX, "");
   const rules: Record<string, string | number> = {};
   let arr: RegExpExecArray | null;
 
-  while ((arr = STYLE_RULES_REGEX.exec(filteredStyle))) {
+  while ((arr = STYLE_RULES_REGEX.exec(style))) {
     const key = arr[1];
     const value = arr[2];
     const rule = key[0] == "-" ? key : camelCase(key);
