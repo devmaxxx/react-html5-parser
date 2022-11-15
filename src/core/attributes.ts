@@ -5,12 +5,7 @@ import {
   BOOL_HTML_ATTRIBUTES,
 } from "./constants";
 import { camelCase, boolAttrValue } from "./utils";
-import {
-  AttributesMap,
-  CSSProperties,
-  Attributes,
-  AtributesPropKeys,
-} from "./types";
+import { AttributesMap, CSSProperties, Attributes } from "./types";
 
 export const htmlAttrsMap = parseAttrs(HTML_ATTRIBUTES, {
   class: "className",
@@ -23,7 +18,7 @@ export function parseAttrs(
   initialValue?: AttributesMap
 ): AttributesMap {
   return attrs.split(" ").reduce<AttributesMap>((acc, prop) => {
-    const value = camelCase(prop) as AtributesPropKeys;
+    const value = camelCase(prop);
 
     acc[prop.toLowerCase()] = value;
 

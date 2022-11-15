@@ -29,7 +29,9 @@ function parse(html: string, options: ParseOptions = {}) {
         renderNodes(getNodeList(html), options)
       );
   } catch (error) {
-    (options.onError || identity)(error);
+    const onError = options.onError;
+
+    if (onError?.call) onError(error);
   }
 
   return emptyFragment;

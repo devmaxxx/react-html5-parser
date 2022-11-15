@@ -10,10 +10,9 @@ export type { CSSProperties };
 export type Key = number | string;
 export type Attributes = Record<
   string,
-  string | number | boolean | undefined | CSSProperties
+  string | number | boolean | CSSProperties
 >;
 export type AttributesMap = Record<string, string>;
-export type AtributesPropKeys = keyof Attributes;
 export type MapNodeFn = (
   node: Node,
   key?: Key,
@@ -25,7 +24,7 @@ export type MapComponentFn = (
 ) => ReactNode;
 export type Components = Record<string, MapComponentFn>;
 export type RenderOptions = {
-  components?: Partial<Components>;
+  components?: Components;
   mapNode?: MapNodeFn;
   mapElement?: MapElementFn;
   attrsMap?: AttributesMap;
