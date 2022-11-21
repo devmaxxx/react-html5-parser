@@ -1,13 +1,11 @@
-import { createElement, Fragment } from "react";
+import { createElement, Fragment, ReactNode } from "react";
 import { SVG_ATTRIBUTES } from "./core/constants";
 import { identity } from "./core/utils";
 import { renderNode, renderNodes, getNodeList } from "./core/render";
 import { parseAttrs } from "./core/attributes";
 import { ParseOptions } from "./core/types";
 
-const emptyFragment = createElement(Fragment);
 const typeErrorMessage = "HTML must be a string";
-
 function checkTypeError(html: unknown, message: string) {
   if (typeof html !== "string") {
     throw new TypeError(message);
@@ -15,6 +13,8 @@ function checkTypeError(html: unknown, message: string) {
 }
 
 function parse(html: string, options: ParseOptions = {}) {
+  let node: ReactNode = null;
+
   try {
     checkTypeError(html, typeErrorMessage);
 
@@ -22,19 +22,20 @@ function parse(html: string, options: ParseOptions = {}) {
 
     checkTypeError(html, "Sanitized " + typeErrorMessage);
 
-    if (html)
-      return createElement(
-        Fragment,
-        {},
-        renderNodes(getNodeList(html), options)
-      );
+    node = createElement(
+      Fragment,
+      {},
+      html && renderNodes(getNodeList(html), options)
+    );
   } catch (error) {
     const onError = options.onError;
 
-    if (onError?.call) onError(error);
+    if (onError?.call) {
+      onError(error, html);
+    }
   }
 
-  return emptyFragment;
+  return node;
 }
 
 export * from "./core/types";

@@ -33,7 +33,7 @@ parse("Lorem <div>ipsum</div>");
 
 ## API
 
-### parse `(html: string, options = {}) => React.Fragment`
+### parse `(html: string, options = {}) => React.Fragment | null`
 
 #### Arguments
 
@@ -44,10 +44,11 @@ parse("Lorem <div>ipsum</div>");
   - `mapNode` (`function?`): Override Dom node
   - `mapElement` (`function?`): Override React element. Сalled after `components` override
   - `attrsMap` (`object?`): Map for converting dom attributes to react attributes
+  - `onError` (`function?`): Listen errors, if we provide not a string `html` or catch an unexpected internal error
 
 #### Return
 
-Return `React.Fragment` with React nodes or empty, if `html` is not/empty `string`
+Return `React.Fragment | null`. We get `null` if html is not a string or catch an unexpected internal error
 
 ### sanitize `(html: string) => string`
 
@@ -66,7 +67,7 @@ parse("<div>Lorem ipsum</div>", {
 
 ### components `{ [key: string]: (props: {}) => ReactNode }`
 
-```ts
+```tsx
 function Typography(props) {
   return <span {...props} />;
 }
@@ -82,10 +83,12 @@ parse("<div>Lorem <b>ipsum</b></div>", {
 
 JSX
 
-```js
-<p>
-  Lorem <span>ipsum</span>
-</p>
+```jsx
+<>
+  <p>
+    Lorem <span>ipsum</span>
+  </p>
+</>
 ```
 
 ### mapNode `(node: Node, key: number | string, options = {}) => Node | ReactNode }`
@@ -130,5 +133,18 @@ const customMap = { classname: "class" };
 
 parse("<div>Lorem <b>ipsum</b></div>", {
   attrsMap: { ...svgAttrsMap, ...customMap },
+});
+```
+
+### onError `(error: unknown, html: unknown) => void`
+
+```tsx
+// if we provide incorrect html, or get internal error
+const res: null = parse(undefined, {
+  onError: (error: unknown, html: unknown) => {
+    bugsnag.notify(error, (event) => {
+      event.addMetadata("htmlparser", { html });
+    });
+  },
 });
 ```

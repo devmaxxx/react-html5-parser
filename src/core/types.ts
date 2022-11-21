@@ -31,5 +31,5 @@ export type RenderOptions = {
 };
 export type ParseOptions = RenderOptions & {
   sanitize?: (html: string) => string;
-  onError?: (error: unknown) => void;
+  onError?: (error: unknown, html: unknown) => void;
 };

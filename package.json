@@ -1,7 +1,7 @@
 {
   "name": "react-html5-parser",
   "amdName": "ReactHTMLParser",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "sideEffects": false,
   "description": "Fast, simple and small (2kb) HTML to React parser in browser",
   "type": "module",
@@ -88,20 +88,20 @@
     {
       "path": "./dist/index.{module,modern}.mjs",
       "import": "{ parse }",
-      "limit": "1.35 kB"
+      "limit": "1.5 kB"
     },
     {
       "path": "./dist/index.{module,modern}.mjs",
       "import": "{ parse, parseAttrs, SVG_ATTRIBUTES }",
-      "limit": "2.3 kB"
+      "limit": "2.4 kB"
     },
     {
       "path": "./dist/index.cjs",
-      "limit": "2.5 kB"
+      "limit": "2.6 kB"
     },
     {
       "path": "./dist/index.umd.js",
-      "limit": "2.6 kB"
+      "limit": "2.7 kB"
     }
   ]
 }
