@@ -3,6 +3,10 @@
 Fast, simple and small (2kb) HTML to React parser in browser
 
 ### Work still in progress
+- [x] Support html parser in node.js
+- [ ] Allowed/forbidden tags
+- [ ] Allowed/forbidden attrs
+- [ ] More tests
 
 ## Install
 

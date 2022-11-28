@@ -1,11 +1,50 @@
 import React from "react";
 import { render } from "@testing-library/react";
+import { parseDocument, DomUtils } from "htmlparser2";
 import { parse } from "../src";
 
 describe("parse", () => {
   it("should be defined and function", () => {
     expect(parse).toBeDefined();
     expect(typeof parse).toBe("function");
+  });
+
+  it("should parse html with htmlparser2", () => {
+    const onError = jest.fn();
+
+    const html1 =
+      '<div class="container" data-vce-boxed-width="true">Hello</div> world';
+
+    const html2 = `<!DOCTYPE html>
+      <html lang="en-US">
+        <head>
+          <meta charset="UTF-8" />
+          <title>title</title>
+        </head>
+        <body>
+          ${html1}
+        </body>
+      </html>`;
+
+    const parser = (str: string) => {
+      const doc = parseDocument(str);
+      const body = DomUtils.findOne((el) => el.name === "body", doc.childNodes);
+
+      return (body || doc).childNodes;
+    };
+
+    const node1 = parse(html1, { parser, onError });
+    const node2 = parse(html2, { parser, onError });
+
+    [node1, node2].map((node) => {
+      const { container } = render(<>{node}</>);
+
+      expect(onError).not.toBeCalled();
+      expect(container).toBeVisible();
+      expect(container.innerHTML.trim()).toMatchInlineSnapshot(
+        `"<div class="container" data-vce-boxed-width="true">Hello</div> world"`
+      );
+    });
   });
 
   it("should parse html", () => {
@@ -16,6 +55,30 @@ describe("parse", () => {
     const { container } = render(<>{node}</>);
 
     expect(container).toBeVisible();
+  });
+
+  it("should parse html temeplate", () => {
+    global.DOMParser = jest.fn().mockImplementationOnce(() => {});
+
+    const node = parse(
+      `<!DOCTYPE html>
+      <html lang="en-US">
+        <head>
+          <meta charset="UTF-8" />
+          <title>title</title>
+        </head>
+        <body>
+          <div>Hello</div>
+        </body>
+      </html>`
+    );
+
+    const { container } = render(<>{node}</>);
+
+    expect(container).toBeVisible();
+    expect(container.innerHTML.trim()).toMatchInlineSnapshot(
+      `"<div>Hello</div>"`
+    );
   });
 
   it("should return empty fragment for empty string", () => {

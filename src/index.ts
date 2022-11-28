@@ -1,7 +1,8 @@
 import { createElement, Fragment, ReactNode } from "react";
 import { SVG_ATTRIBUTES } from "./core/constants";
 import { identity } from "./core/utils";
-import { renderNode, renderNodes, getNodeList } from "./core/render";
+import { renderNode, renderNodes } from "./core/render";
+import { parseHtml } from "./core/parser";
 import { parseAttrs } from "./core/attributes";
 import { ParseOptions } from "./core/types";
 
@@ -25,7 +26,7 @@ function parse(html: string, options: ParseOptions = {}) {
     node = createElement(
       Fragment,
       {},
-      html && renderNodes(getNodeList(html), options)
+      html && renderNodes((options.parser || parseHtml)(html), options)
     );
   } catch (error) {
     const onError = options.onError;

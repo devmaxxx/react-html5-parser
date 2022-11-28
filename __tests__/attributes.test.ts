@@ -26,17 +26,13 @@ function filterAttrs(
 }
 
 function attrsObjToNode(attrs: Record<string, any>): any {
-  const attributes = Object.entries(attrs).reduce<Attr[]>(
-    (acc, [nodeName, nodeValue]) => (
-      acc.push({ nodeName, nodeValue } as Attr), acc
-    ),
-    []
-  );
+  const node = document.createElement("div");
 
-  return {
-    attributes,
-    getAttribute: (name: string) => attrs[name],
-  };
+  for (let attr in attrs) {
+    node.setAttribute(attr, attrs[attr]);
+  }
+
+  return node;
 }
 
 const allHtmlAttrsMap = { ...boolHtmlAttrsMap, ...htmlAttrsMap };

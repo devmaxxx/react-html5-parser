@@ -5,7 +5,13 @@ import {
   BOOL_HTML_ATTRIBUTES,
 } from "./constants";
 import { camelCase, boolAttrValue } from "./utils";
-import { AttributesMap, CSSProperties, Attributes } from "./types";
+import {
+  AttributesMap,
+  CSSProperties,
+  Attributes,
+  RenderElement,
+  RenderElementAttributes,
+} from "./types";
 
 export const htmlAttrsMap = parseAttrs(HTML_ATTRIBUTES, {
   class: "className",
@@ -47,29 +53,33 @@ export function styleToObject(style: string): CSSProperties {
 }
 
 export function attrsToProps(
-  node: Element,
+  element: RenderElement,
   attrsMap: AttributesMap
 ): Attributes {
-  return Array.from(node.attributes).reduce<Attributes>(
-    (acc, { nodeName, nodeValue }) => {
-      const defaultAttrValue = nodeValue || "";
-      const attrKey =
-        !["reset", "submit"].includes(node.getAttribute("type") || "") &&
-        ["checked", "value"].includes(nodeName)
-          ? camelCase("default-" + nodeName)
-          : attrsMap[nodeName] || nodeName;
+  return Array.from(
+    element.attributes as RenderElementAttributes
+  ).reduce<Attributes>((acc, { name, value }) => {
+    const defaultValue = value || "";
+    const type = "type";
+    const key =
+      ["checked", "value"].includes(name) &&
+      !["reset", "submit"].includes(
+        ("attribs" in element
+          ? element.attribs[type]
+          : element.getAttribute(type)) || ""
+      )
+        ? camelCase("default-" + name)
+        : attrsMap[name] || name;
 
-      acc[attrKey] =
-        attrKey == "style"
-          ? defaultAttrValue
-            ? styleToObject(defaultAttrValue)
-            : {}
-          : boolHtmlAttrsMap[nodeName]
-          ? boolAttrValue(nodeValue, nodeName)
-          : defaultAttrValue;
+    acc[key] =
+      key == "style"
+        ? defaultValue
+          ? styleToObject(defaultValue)
+          : {}
+        : boolHtmlAttrsMap[name]
+        ? boolAttrValue(value, name)
+        : defaultValue;
 
-      return acc;
-    },
-    {}
-  );
+    return acc;
+  }, {});
 }

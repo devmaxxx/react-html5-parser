@@ -1,56 +1,51 @@
 import { ReactNode, createElement, isValidElement } from "react";
 import { identity } from "./utils";
 import { attrsToProps, boolHtmlAttrsMap, htmlAttrsMap } from "./attributes";
-import { RenderOptions, Key } from "./types";
-
-export function getNodeList(html: string, _container?: HTMLElement) {
-  try {
-    _container = new DOMParser().parseFromString(html, "text/html").body;
-  } catch (_) {
-    _container = document.createElement("div");
-    _container.innerHTML = html;
-  }
-
-  return _container.childNodes;
-}
+import {
+  RenderOptions,
+  Key,
+  RenderNodeList,
+  RenderNode,
+  RenderElement,
+  RenderTextNode,
+} from "./types";
 
 export function renderNode(
-  node: Node,
+  node: RenderNode,
   key?: Key,
   options: RenderOptions = {}
 ): ReactNode {
   const { mapNode, mapElement, components } = options;
-  const _mapNode = mapNode || identity;
-  const _node = _mapNode(node, key, options);
+  const _node = (mapNode || identity)(node, key, options);
+  //@ts-ignore
+  const nodeType = _node?.nodeType;
 
-  if (!(_node && _node instanceof Node)) {
-    return _node;
+  if (!nodeType) {
+    return _node as ReactNode;
   }
 
-  const nodeType = _node.nodeType;
-
   if (nodeType === 3) {
-    return _node.nodeValue;
+    return (<RenderTextNode>_node).nodeValue;
   }
 
   if (nodeType === 1) {
-    const { childNodes, nodeName } = _node as Element;
-    const _nodeName = nodeName.toLowerCase();
+    const { childNodes, tagName } = <RenderElement>_node;
+    const tag = tagName.toLowerCase();
     const children = childNodes.length
       ? renderNodes(childNodes, options)
       : null;
     const props = Object.assign(
       { key, children },
       attrsToProps(
-        _node as Element,
+        <RenderElement>_node,
         Object.assign({}, htmlAttrsMap, boolHtmlAttrsMap, options.attrsMap)
       )
     );
-    const mapComponent = components?.[_nodeName];
+    const mapComponent = components?.[tag];
 
     const reactNode = mapComponent
       ? mapComponent(props)
-      : createElement(_nodeName, props);
+      : createElement(tag, props);
 
     return mapElement && isValidElement(reactNode)
       ? mapElement(reactNode)
@@ -59,7 +54,7 @@ export function renderNode(
 }
 
 export function renderNodes(
-  nodeList: NodeListOf<Node> | Node[],
+  nodeList: RenderNodeList,
   options?: RenderOptions
 ): ReactNode[] {
   return Array.from(nodeList).reduce<ReactNode[]>(
