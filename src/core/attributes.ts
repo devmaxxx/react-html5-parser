@@ -5,13 +5,7 @@ import {
   BOOL_HTML_ATTRIBUTES,
 } from "./constants";
 import { camelCase, boolAttrValue } from "./utils";
-import {
-  AttributesMap,
-  CSSProperties,
-  Attributes,
-  RenderElement,
-  RenderElementAttributes,
-} from "./types";
+import { AttributesMap, CSSProperties, Props, Attribute } from "./types";
 
 export const htmlAttrsMap = parseAttrs(HTML_ATTRIBUTES, {
   class: "className",
@@ -53,20 +47,16 @@ export function styleToObject(style: string): CSSProperties {
 }
 
 export function attrsToProps(
-  element: RenderElement,
+  attributes: Attribute[],
   attrsMap: AttributesMap
-): Attributes {
-  return Array.from(
-    element.attributes as RenderElementAttributes
-  ).reduce<Attributes>((acc, { name, value }) => {
+): Props {
+  return attributes.reduce<Props>((acc, { name, value }, _, arr) => {
     const defaultValue = value || "";
-    const type = "type";
     const key =
       ["checked", "value"].includes(name) &&
-      !["reset", "submit"].includes(
-        ("attribs" in element
-          ? element.attribs[type]
-          : element.getAttribute(type)) || ""
+      !arr.some(
+        (el) =>
+          el.name === "type" && ["reset", "submit"].includes(el.value || "")
       )
         ? camelCase("default-" + name)
         : attrsMap[name] || name;

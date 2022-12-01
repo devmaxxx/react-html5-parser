@@ -25,14 +25,14 @@ function filterAttrs(
   }, {});
 }
 
-function attrsObjToNode(attrs: Record<string, any>): any {
-  const node = document.createElement("div");
+function toAttrs(attrs: Record<string, any>): any {
+  const arr = [];
 
   for (let attr in attrs) {
-    node.setAttribute(attr, attrs[attr]);
+    arr.push({ name: attr, value: attrs[attr] });
   }
 
-  return node;
+  return arr;
 }
 
 const allHtmlAttrsMap = { ...boolHtmlAttrsMap, ...htmlAttrsMap };
@@ -71,7 +71,7 @@ describe("#attributes", () => {
   });
 
   it("should transform boolean attrs", () => {
-    const attributes = attrsObjToNode({
+    const attributes = toAttrs({
       allowfullscreen: "",
       allowpaymentrequest: "",
       async: "false",
@@ -138,7 +138,7 @@ describe("#attributes", () => {
     [{ download: "" }, { download: true }],
     [{ download: "filename" }, { download: "filename" }],
   ])("should transform specific boolean attrs: %p", (attrs, props) => {
-    expect(attrsToProps(attrsObjToNode(attrs), allHtmlAttrsMap)).toEqual(props);
+    expect(attrsToProps(toAttrs(attrs), allHtmlAttrsMap)).toEqual(props);
   });
 
   it.each([
@@ -161,7 +161,7 @@ describe("#attributes", () => {
   ])(
     "should transform controlled attrs to uncontrolled: %p",
     (attrs, props) => {
-      const attributes = attrsToProps(attrsObjToNode(attrs), allHtmlAttrsMap);
+      const attributes = attrsToProps(toAttrs(attrs), allHtmlAttrsMap);
 
       expect(attributes).toEqual(props);
     }

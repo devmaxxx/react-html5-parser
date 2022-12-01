@@ -10,13 +10,11 @@ export type { CSSProperties };
 export type RenderNode = Node | domhandler.Node | domhandler.DataNode;
 export type RenderTextNode = Node | domhandler.DataNode;
 export type RenderElement = Element | domhandler.Element;
-export type RenderElementAttributes = domhandler.Element["attributes"];
+export type Attribute = { name: string; value: string };
+export type RenderElementAttributes = Attribute[];
 export type RenderNodeList = NodeListOf<Node> | RenderNode[];
 export type Key = number | string;
-export type Attributes = Record<
-  string,
-  string | number | boolean | CSSProperties
->;
+export type Props = Record<string, string | number | boolean | CSSProperties>;
 export type AttributesMap = Record<string, string>;
 export type MapNodeFn = (
   node: RenderNode,
@@ -26,7 +24,7 @@ export type MapNodeFn = (
 export type ParserFn = (html: string) => any[];
 export type MapElementFn = (element: ReactElement) => ReactNode;
 export type MapComponentFn = (
-  props: PropsWithChildren<Attributes & { key?: Key }>
+  props: PropsWithChildren<Props & { key?: Key }>
 ) => ReactNode;
 export type Components = Record<string, MapComponentFn>;
 export type RenderOptions = {

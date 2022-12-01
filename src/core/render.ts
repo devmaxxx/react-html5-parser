@@ -8,6 +8,7 @@ import {
   RenderNode,
   RenderElement,
   RenderTextNode,
+  Attribute,
 } from "./types";
 
 export function renderNode(
@@ -29,7 +30,7 @@ export function renderNode(
   }
 
   if (nodeType === 1) {
-    const { childNodes, tagName } = <RenderElement>_node;
+    const { childNodes, tagName, attributes } = <RenderElement>_node;
     const tag = tagName.toLowerCase();
     const children = childNodes.length
       ? renderNodes(childNodes, options)
@@ -37,7 +38,7 @@ export function renderNode(
     const props = Object.assign(
       { key, children },
       attrsToProps(
-        <RenderElement>_node,
+        Array.from(attributes as ArrayLike<Attribute>),
         Object.assign({}, htmlAttrsMap, boolHtmlAttrsMap, options.attrsMap)
       )
     );
