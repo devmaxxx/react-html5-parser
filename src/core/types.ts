@@ -13,7 +13,10 @@ export type Attribute = { name: string; value: string };
 export type RenderElementAttributes = Attribute[];
 export type RenderNodeList = NodeListOf<Node> | RenderNode[];
 export type Key = number | string;
-export type Props = Record<string, string | number | boolean | CSSProperties>;
+export type PropKey = string;
+export type PropValue = string | number | boolean | CSSProperties;
+export type PropArr = [PropKey, PropValue];
+export type Props = Record<PropKey, PropValue>;
 export type AttributesMap = Record<string, string>;
 export type MapNodeFn = (
   node: RenderNode,
@@ -26,10 +29,11 @@ export type MapComponentProps = PropsWithChildren<Props & { key?: Key }>;
 export type MapComponentFn = (props: MapComponentProps) => ReactNode;
 export type Components = Record<string, MapComponentFn>;
 export type CommonOptions = {
+  attrsMap: AttributesMap;
   components?: Components;
   mapNode?: MapNodeFn;
   mapElement?: MapElementFn;
-  attrsMap: AttributesMap;
+  mapAttr?: (propArr: PropArr, attr: Attribute) => PropArr | null;
 };
 export type RenderOptions = CommonOptions & {
   onError: (error: unknown) => void;

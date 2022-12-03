@@ -1,10 +1,5 @@
 import { SVG_ATTRIBUTES } from "../src/core/constants";
-import {
-  htmlAttrsMap,
-  boolHtmlAttrsMap,
-  parseAttrs,
-  attrsToProps,
-} from "../src/core/attributes";
+import { htmlAttrsMap, parseAttrs, attrsToProps } from "../src/core/attributes";
 import { possibleStandardNames } from "./possibleStandardNames";
 
 // filter key=value attrs
@@ -35,8 +30,6 @@ function toAttrs(attrs: Record<string, any>): any {
   return arr;
 }
 
-const allHtmlAttrsMap = { ...boolHtmlAttrsMap, ...htmlAttrsMap };
-
 describe("#attributes", () => {
   it("should support all html/svg attributes", () => {
     // react only keys
@@ -54,7 +47,6 @@ describe("#attributes", () => {
 
     const allAttributes = {
       ...htmlAttrsMap,
-      ...boolHtmlAttrsMap,
       ...svgAttrsMap,
     };
 
@@ -100,7 +92,7 @@ describe("#attributes", () => {
       truespeed: "",
     });
 
-    const attrs = attrsToProps(attributes, allHtmlAttrsMap);
+    const attrs = attrsToProps(attributes, { attrsMap: htmlAttrsMap });
 
     expect(attrs).toMatchInlineSnapshot(`
       {
@@ -138,7 +130,9 @@ describe("#attributes", () => {
     [{ download: "" }, { download: true }],
     [{ download: "filename" }, { download: "filename" }],
   ])("should transform specific boolean attrs: %p", (attrs, props) => {
-    expect(attrsToProps(toAttrs(attrs), allHtmlAttrsMap)).toEqual(props);
+    expect(attrsToProps(toAttrs(attrs), { attrsMap: htmlAttrsMap })).toEqual(
+      props
+    );
   });
 
   it.each([
@@ -165,7 +159,9 @@ describe("#attributes", () => {
   ])(
     "should transform controlled attrs to uncontrolled: %p",
     (attrs, props) => {
-      const attributes = attrsToProps(toAttrs(attrs), allHtmlAttrsMap);
+      const attributes = attrsToProps(toAttrs(attrs), {
+        attrsMap: htmlAttrsMap,
+      });
 
       expect(attributes).toEqual(props);
     }

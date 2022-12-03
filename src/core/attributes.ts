@@ -4,8 +4,14 @@ import {
   HTML_ATTRIBUTES,
   BOOL_HTML_ATTRIBUTES,
 } from "./constants";
-import { camelCase, boolAttrValue } from "./utils";
-import { AttributesMap, CSSProperties, Props, Attribute } from "./types";
+import { camelCase, boolAttrValue, identity } from "./utils";
+import {
+  AttributesMap,
+  CSSProperties,
+  Props,
+  Attribute,
+  RenderOptions,
+} from "./types";
 
 export const parseAttrs = (
   attrs: string,
@@ -39,33 +45,41 @@ export const styleToObject = (style: string): CSSProperties => {
 
 export const attrsToProps = (
   attributes: Attribute[],
-  attrsMap: AttributesMap
+  options: Pick<RenderOptions, "attrsMap" | "mapAttr">
 ): Props =>
-  attributes.reduce<Props>((acc, { name, value }, _, arr) => {
-    const defaultValue = value || "";
-    const key =
+  attributes.reduce<Props>((acc, attr, _, arr) => {
+    const { name, value } = attr;
+    const propKey =
       ["checked", "value"].includes(name) &&
       !arr.some(
-        (el) =>
-          el.name === "type" && ["reset", "submit"].includes(el.value || "")
+        (el) => el.name === "type" && ["reset", "submit"].includes(el.value)
       )
         ? camelCase("default-" + name)
-        : attrsMap[name] || name;
-
-    acc[key] =
-      key === "style"
-        ? defaultValue
-          ? styleToObject(defaultValue)
+        : options.attrsMap[name] || name;
+    const propValue =
+      propKey === "style"
+        ? value
+          ? styleToObject(value)
           : {}
         : boolHtmlAttrsMap[name]
         ? boolAttrValue(value, name)
-        : defaultValue;
+        : value;
+
+    const prop = (options.mapAttr || identity)([propKey, propValue], attr);
+
+    if (prop) acc[prop[0]] = prop[1];
 
     return acc;
   }, {});
 
-export const htmlAttrsMap = parseAttrs(HTML_ATTRIBUTES, {
-  class: "className",
-  for: "htmlFor",
-});
 export const boolHtmlAttrsMap = parseAttrs(BOOL_HTML_ATTRIBUTES);
+export const htmlAttrsMap = parseAttrs(
+  HTML_ATTRIBUTES,
+  Object.assign(
+    {
+      class: "className",
+      for: "htmlFor",
+    },
+    boolHtmlAttrsMap
+  )
+);

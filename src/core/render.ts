@@ -28,10 +28,7 @@ export const renderNode = (
       : null;
     const props = Object.assign(
       { key, children },
-      attrsToProps(
-        Array.from(attributes as ArrayLike<Attribute>),
-        options.attrsMap
-      )
+      attrsToProps(Array.from(attributes as ArrayLike<Attribute>), options)
     );
 
     const reactNode = (mapElement || identity)(createElement(tag, props));

@@ -3,7 +3,7 @@ import { SVG_ATTRIBUTES } from "./core/constants";
 import { identity, isString } from "./core/utils";
 import { renderNodes } from "./core/render";
 import { parseHtml } from "./core/parser";
-import { boolHtmlAttrsMap, htmlAttrsMap, parseAttrs } from "./core/attributes";
+import { htmlAttrsMap, parseAttrs } from "./core/attributes";
 import { ParseOptions, RenderOptions } from "./core/types";
 
 const typeErrorMessage = "HTML must be a string";
@@ -16,12 +16,7 @@ const parse = (html: string, options: ParseOptions = {}) => {
 
   const _onError = options.onError;
   options.onError = (error: unknown) => _onError && _onError(error, { html });
-  options.attrsMap = Object.assign(
-    {},
-    htmlAttrsMap,
-    boolHtmlAttrsMap,
-    options.attrsMap
-  );
+  options.attrsMap = Object.assign({}, htmlAttrsMap, options.attrsMap);
 
   try {
     checkTypeError(html, typeErrorMessage);
