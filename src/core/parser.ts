@@ -1,4 +1,4 @@
-export function parseHtml(html: string, _doc?: Document) {
+export const parseHtml = (html: string, _doc?: Document) => {
   try {
     _doc = new DOMParser().parseFromString(html, "text/html");
   } catch (_) {
@@ -7,4 +7,4 @@ export function parseHtml(html: string, _doc?: Document) {
   }
 
   return _doc.body.childNodes;
-}
+};

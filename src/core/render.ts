@@ -1,36 +1,27 @@
 import { ReactNode, createElement, isValidElement } from "react";
-import { identity } from "./utils";
-import { attrsToProps, boolHtmlAttrsMap, htmlAttrsMap } from "./attributes";
+import { identity, isNode, isString } from "./utils";
+import { attrsToProps } from "./attributes";
 import {
   RenderOptions,
   Key,
   RenderNodeList,
   RenderNode,
   RenderElement,
-  RenderTextNode,
   Attribute,
 } from "./types";
 
-export function renderNode(
+export const renderNode = (
   node: RenderNode,
-  key?: Key,
-  options: RenderOptions = {}
-): ReactNode {
-  const { mapNode, mapElement, components } = options;
-  const _node = (mapNode || identity)(node, key, options);
-  //@ts-ignore
-  const nodeType = _node?.nodeType;
+  key: Key,
+  options: RenderOptions
+): ReactNode => {
+  const { mapElement, components } = options;
+  const { nodeType, nodeValue } = node;
 
-  if (!nodeType) {
-    return _node as ReactNode;
-  }
-
-  if (nodeType === 3) {
-    return (<RenderTextNode>_node).nodeValue;
-  }
+  if (nodeType === 3) return nodeValue;
 
   if (nodeType === 1) {
-    const { childNodes, tagName, attributes } = <RenderElement>_node;
+    const { childNodes, tagName, attributes } = node as RenderElement;
     const tag = tagName.toLowerCase();
     const children = childNodes.length
       ? renderNodes(childNodes, options)
@@ -39,27 +30,41 @@ export function renderNode(
       { key, children },
       attrsToProps(
         Array.from(attributes as ArrayLike<Attribute>),
-        Object.assign({}, htmlAttrsMap, boolHtmlAttrsMap, options.attrsMap)
+        options.attrsMap
       )
     );
-    const mapComponent = components?.[tag];
 
-    const reactNode = mapComponent
-      ? mapComponent(props)
-      : createElement(tag, props);
+    const reactNode = (mapElement || identity)(createElement(tag, props));
+    const mapComponent =
+      components &&
+      isValidElement(reactNode) &&
+      isString(reactNode.type) &&
+      components[reactNode.type];
 
-    return mapElement && isValidElement(reactNode)
-      ? mapElement(reactNode)
+    return mapComponent
+      ? mapComponent(Object.assign({}, reactNode.props))
       : reactNode;
   }
-}
+};
 
-export function renderNodes(
+export const renderNodes = (
   nodeList: RenderNodeList,
-  options?: RenderOptions
-): ReactNode[] {
-  return Array.from(nodeList).reduce<ReactNode[]>(
-    (acc, node, key) => (acc.push(renderNode(node, key, options)), acc),
-    []
-  );
-}
+  options: RenderOptions
+): ReactNode[] => {
+  return Array.from(nodeList).reduce<ReactNode[]>((acc, node, key) => {
+    let _node = (options.mapNode || identity)(node, key, options);
+    _node = isNode(_node)
+      ? renderNode(_node, key, options)
+      : Array.isArray(_node)
+      ? renderNodes(_node, options)
+      : _node;
+
+    try {
+      acc.push(_node);
+    } catch (error) {
+      options.onError(error);
+    }
+
+    return acc;
+  }, []);
+};

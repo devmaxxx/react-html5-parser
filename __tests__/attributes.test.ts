@@ -151,6 +151,10 @@ describe("#attributes", () => {
       { defaultValue: "panose1", type: "text" },
     ],
     [
+      { value: "panose1", type: "" },
+      { defaultValue: "panose1", type: "" },
+    ],
+    [
       { value: "panose1", type: "submit" },
       { value: "panose1", type: "submit" },
     ],

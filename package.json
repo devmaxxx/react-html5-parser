@@ -94,15 +94,15 @@
     {
       "path": "./dist/index.{module,modern}.mjs",
       "import": "{ parse, parseAttrs, SVG_ATTRIBUTES }",
-      "limit": "2.4 kB"
+      "limit": "2.5 kB"
     },
     {
       "path": "./dist/index.cjs",
-      "limit": "2.6 kB"
+      "limit": "2.7 kB"
     },
     {
       "path": "./dist/index.umd.js",
-      "limit": "2.7 kB"
+      "limit": "2.8 kB"
     }
   ]
 }

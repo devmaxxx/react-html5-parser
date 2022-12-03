@@ -1,20 +1,27 @@
 import { createElement, Fragment, ReactNode } from "react";
 import { SVG_ATTRIBUTES } from "./core/constants";
-import { identity } from "./core/utils";
-import { renderNode, renderNodes } from "./core/render";
+import { identity, isString } from "./core/utils";
+import { renderNodes } from "./core/render";
 import { parseHtml } from "./core/parser";
-import { parseAttrs } from "./core/attributes";
-import { ParseOptions } from "./core/types";
+import { boolHtmlAttrsMap, htmlAttrsMap, parseAttrs } from "./core/attributes";
+import { ParseOptions, RenderOptions } from "./core/types";
 
 const typeErrorMessage = "HTML must be a string";
-function checkTypeError(html: unknown, message: string) {
-  if (typeof html !== "string") {
-    throw new TypeError(message);
-  }
-}
+const checkTypeError = (html: unknown, message: string) => {
+  if (!isString(html)) throw new TypeError(message);
+};
 
-function parse(html: string, options: ParseOptions = {}) {
+const parse = (html: string, options: ParseOptions = {}) => {
   let node: ReactNode = null;
+
+  const _onError = options.onError;
+  options.onError = (error: unknown) => _onError && _onError(error, { html });
+  options.attrsMap = Object.assign(
+    {},
+    htmlAttrsMap,
+    boolHtmlAttrsMap,
+    options.attrsMap
+  );
 
   try {
     checkTypeError(html, typeErrorMessage);
@@ -26,18 +33,18 @@ function parse(html: string, options: ParseOptions = {}) {
     node = createElement(
       Fragment,
       {},
-      html && renderNodes((options.parser || parseHtml)(html), options)
+      html &&
+        renderNodes(
+          (options.parser || parseHtml)(html),
+          options as RenderOptions
+        )
     );
   } catch (error) {
-    const onError = options.onError;
-
-    if (onError?.call) {
-      onError(error, html);
-    }
+    (options as RenderOptions).onError(error);
   }
 
   return node;
-}
+};
 
 export * from "./core/types";
-export { parse, parseAttrs, renderNodes, renderNode, SVG_ATTRIBUTES };
+export { parse, parseAttrs, SVG_ATTRIBUTES };

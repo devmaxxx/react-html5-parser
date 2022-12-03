@@ -70,15 +70,22 @@ describe("parse", () => {
         <body>
           <div>Hello</div>
         </body>
-      </html>`
+      </html>`,
+      {
+        mapNode: (node) => {
+          if (node.nodeType === node.ELEMENT_NODE) {
+            return Array.from(node.childNodes);
+          }
+
+          return node;
+        },
+      }
     );
 
     const { container } = render(<>{node}</>);
 
     expect(container).toBeVisible();
-    expect(container.innerHTML.trim()).toMatchInlineSnapshot(
-      `"<div>Hello</div>"`
-    );
+    expect(container.innerHTML.trim()).toMatchInlineSnapshot(`"Hello"`);
   });
 
   it("should return empty fragment for empty string", () => {
@@ -98,10 +105,9 @@ describe("parse", () => {
     const node = parse(null, { onError });
 
     expect(onError).toBeCalled();
-    expect(onError).toBeCalledWith(
-      new TypeError("HTML must be a string"),
-      null
-    );
+    expect(onError).toBeCalledWith(new TypeError("HTML must be a string"), {
+      html: null,
+    });
     expect(node).toStrictEqual(null);
   });
 
@@ -114,7 +120,9 @@ describe("parse", () => {
     expect(onError).toBeCalled();
     expect(onError).toBeCalledWith(
       new TypeError("Sanitized HTML must be a string"),
-      null
+      {
+        html: null,
+      }
     );
     expect(node).toStrictEqual(null);
   });
@@ -122,12 +130,16 @@ describe("parse", () => {
   it("should parse components", () => {
     global.DOMParser = jest.fn().mockImplementationOnce(() => {});
 
+    function C(props: any) {
+      return <b {...props} />;
+    }
+
     const node = parse(
       `Hello,<c>!</c><div class='active' style='color: red; font-size-adjust: initial; font-weight: 600' id>, world<span style>!</span><b></b></div><input type='text' value="Submit">`,
       {
         components: {
           span: (props) => <b {...props} />,
-          c: (props) => <b {...props} />,
+          c: C,
         },
         mapElement: (element) => {
           return element;

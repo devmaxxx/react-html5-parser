@@ -7,30 +7,21 @@ import {
 import { camelCase, boolAttrValue } from "./utils";
 import { AttributesMap, CSSProperties, Props, Attribute } from "./types";
 
-export const htmlAttrsMap = parseAttrs(HTML_ATTRIBUTES, {
-  class: "className",
-  for: "htmlFor",
-});
-export const boolHtmlAttrsMap = parseAttrs(BOOL_HTML_ATTRIBUTES);
-
-export function parseAttrs(
+export const parseAttrs = (
   attrs: string,
   initialValue?: AttributesMap
-): AttributesMap {
-  return attrs.split(" ").reduce<AttributesMap>((acc, prop) => {
+): AttributesMap =>
+  attrs.split(" ").reduce<AttributesMap>((acc, prop) => {
     const value = camelCase(prop);
 
     acc[prop.toLowerCase()] = value;
 
-    if (prop.match(/[-:]/)) {
-      acc[value.toLowerCase()] = value;
-    }
+    if (prop.match(/[-:]/)) acc[value.toLowerCase()] = value;
 
     return acc;
   }, initialValue || {});
-}
 
-export function styleToObject(style: string): CSSProperties {
+export const styleToObject = (style: string): CSSProperties => {
   style = style.replace(STYLE_COMMENTS_REGEX, "");
   const rules: Record<string, string | number> = {};
   let arr: RegExpExecArray | null;
@@ -38,19 +29,19 @@ export function styleToObject(style: string): CSSProperties {
   while ((arr = STYLE_RULES_REGEX.exec(style))) {
     const key = arr[1];
     const value = arr[2];
-    const rule = key[0] == "-" ? key : camelCase(key);
+    const rule = key[0] === "-" ? key : camelCase(key);
 
     rules[rule] = value;
   }
 
   return rules;
-}
+};
 
-export function attrsToProps(
+export const attrsToProps = (
   attributes: Attribute[],
   attrsMap: AttributesMap
-): Props {
-  return attributes.reduce<Props>((acc, { name, value }, _, arr) => {
+): Props =>
+  attributes.reduce<Props>((acc, { name, value }, _, arr) => {
     const defaultValue = value || "";
     const key =
       ["checked", "value"].includes(name) &&
@@ -62,7 +53,7 @@ export function attrsToProps(
         : attrsMap[name] || name;
 
     acc[key] =
-      key == "style"
+      key === "style"
         ? defaultValue
           ? styleToObject(defaultValue)
           : {}
@@ -72,4 +63,9 @@ export function attrsToProps(
 
     return acc;
   }, {});
-}
+
+export const htmlAttrsMap = parseAttrs(HTML_ATTRIBUTES, {
+  class: "className",
+  for: "htmlFor",
+});
+export const boolHtmlAttrsMap = parseAttrs(BOOL_HTML_ATTRIBUTES);
