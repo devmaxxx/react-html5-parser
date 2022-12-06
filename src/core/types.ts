@@ -4,26 +4,38 @@ import {
   ReactElement,
   ReactNode,
 } from "react";
-// import * as domhandler from "domhandler";
 
 export type { CSSProperties };
-export type RenderNode = Node;
-export type RenderElement = Element;
+
 export type Attribute = { name: string; value: string };
-export type RenderElementAttributes = Attribute[];
-export type RenderNodeList = NodeListOf<Node> | RenderNode[];
+export type AttributesMap = Record<string, string>;
+export type Attributes = Attribute[] | ArrayLike<Attribute>;
+export type ParserChildNodes =
+  | Array<ParserNode | ParserElement>
+  | ArrayLike<ParserNode | ParserElement>;
+export type ParserNode = {
+  nodeType: number;
+  nodeValue?: string | null;
+  childNodes?: ParserChildNodes;
+};
+export type ParserElement = ParserNode & {
+  tagName: string;
+  attributes: Attributes;
+};
+export type RenderNode = ParserNode;
+export type RenderElement = ParserElement;
+export type RenderNodeList = ParserChildNodes;
 export type Key = number | string;
 export type PropKey = string;
 export type PropValue = string | number | boolean | CSSProperties;
 export type PropArr = [PropKey, PropValue];
 export type Props = Record<PropKey, PropValue>;
-export type AttributesMap = Record<string, string>;
 export type MapNodeFn = (
   node: RenderNode,
   key?: Key,
   options?: RenderOptions
-) => Node | RenderNode[] | ReactNode;
-export type ParserFn = (html: string) => any[];
+) => RenderNode | Array<RenderNode> | ReactNode;
+export type ParserFn = (html: string) => ParserChildNodes;
 export type MapElementFn = (element: ReactElement) => ReactNode;
 export type MapComponentProps = PropsWithChildren<Props & { key?: Key }>;
 export type MapComponentFn = (props: MapComponentProps) => ReactNode;

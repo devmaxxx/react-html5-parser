@@ -7,7 +7,6 @@ import {
   RenderNodeList,
   RenderNode,
   RenderElement,
-  Attribute,
 } from "./types";
 
 export const renderNode = (
@@ -23,12 +22,11 @@ export const renderNode = (
   if (nodeType === 1) {
     const { childNodes, tagName, attributes } = node as RenderElement;
     const tag = tagName.toLowerCase();
-    const children = childNodes.length
-      ? renderNodes(childNodes, options)
-      : null;
+    const children =
+      childNodes && childNodes.length ? renderNodes(childNodes, options) : null;
     const props = Object.assign(
       { key, children },
-      attrsToProps(Array.from(attributes as ArrayLike<Attribute>), options)
+      attrsToProps(Array.from(attributes), options)
     );
 
     const reactNode = (mapElement || identity)(createElement(tag, props));
@@ -49,15 +47,16 @@ export const renderNodes = (
   options: RenderOptions
 ): ReactNode[] => {
   return Array.from(nodeList).reduce<ReactNode[]>((acc, node, key) => {
-    let _node = (options.mapNode || identity)(node, key, options);
-    _node = isNode(_node)
-      ? renderNode(_node, key, options)
-      : Array.isArray(_node)
-      ? renderNodes(_node, options)
-      : _node;
-
     try {
-      acc.push(_node);
+      let _node = (options.mapNode || identity)(node, key, options);
+
+      acc.push(
+        isNode(_node)
+          ? renderNode(_node, key, options)
+          : Array.isArray(_node)
+          ? renderNodes(_node, options)
+          : _node
+      );
     } catch (error) {
       options.onError(error);
     }

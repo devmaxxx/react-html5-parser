@@ -72,8 +72,10 @@ describe("parse", () => {
         </body>
       </html>`,
       {
-        mapNode: (node) => {
-          if (node.nodeType === node.ELEMENT_NODE) {
+        mapNode: (n) => {
+          const node = n as Node;
+
+          if (node.nodeType === node.ELEMENT_NODE && node.nodeName === "DIV") {
             return Array.from(node.childNodes);
           }
 
