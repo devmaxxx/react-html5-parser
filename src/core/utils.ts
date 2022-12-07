@@ -23,30 +23,37 @@ export const arrToObj = (arr?: string[]) =>
     {}
   );
 
+export const getTagName = (obj: Record<string, boolean>, node: ParserNode) =>
+  isNode(node) &&
+  node.nodeType === 1 &&
+  obj[(node as ParserElement).tagName.toLowerCase()];
+
+export const getPropName = (
+  obj: Record<string, boolean>,
+  propArr: PropArr,
+  attr: Attribute
+) => obj[propArr[0]] || obj[attr.name];
+
 export const allowOnlyTags =
   (tags: string[], obj = arrToObj(tags)) =>
   (node: ParserNode) =>
-    isNode(node) &&
-    node.nodeType === 1 &&
-    obj[(node as ParserElement).tagName.toLowerCase()]
+    getTagName(obj, node)
       ? getChildNodes((node as ParserElement).childNodes)
       : node;
 
 export const forbidTags =
   (tags: string[], obj = arrToObj(tags)) =>
   (node: ParserNode) =>
-    isNode(node) &&
-    node.nodeType === 1 &&
-    !obj[(node as ParserElement).tagName.toLowerCase()]
+    !getTagName(obj, node)
       ? getChildNodes((node as ParserElement).childNodes)
       : node;
 
 export const allowOnlyAttrs =
   (attrs: string[], obj = arrToObj(attrs)) =>
   (propArr: PropArr, attr: Attribute) =>
-    obj[propArr[0]] || obj[attr.name] ? null : propArr;
+    getPropName(obj, propArr, attr) ? null : propArr;
 
 export const forbidAttrs =
   (attrs: string[], obj = arrToObj(attrs)) =>
   (propArr: PropArr, attr: Attribute) =>
-    !(obj[propArr[0]] || obj[attr.name]) ? null : propArr;
+    !getPropName(obj, propArr, attr) ? null : propArr;
