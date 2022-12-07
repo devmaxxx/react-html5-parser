@@ -3,7 +3,7 @@ import { ParserNode, ParserElement, PropArr, Attribute } from "./types";
 export const camelCase = (value: string) =>
   value.replace(/[-:](\w)/g, (_, $1) => $1.toUpperCase());
 
-export const identity = <T>(value: T): T => value;
+export const identity = <T>(value: T) => value;
 
 export const boolAttrValue = (value: unknown, nodeName?: string) =>
   !value || (nodeName === "download" ? value : !!value);
@@ -14,38 +14,39 @@ export const isString = (value: unknown): value is string =>
 export const isNode = (value: unknown): value is ParserNode =>
   !!value && typeof value === "object" && "nodeType" in value;
 
-const isElement = (node: ParserNode): node is ParserElement =>
-  isNode(node) && node.nodeType === 1;
+export const getChildNodes = (childNodes: ParserElement["childNodes"]) =>
+  (childNodes.length && Array.from(childNodes)) || null;
 
-export const arrToObj = (arr: string[]) =>
-  arr.reduce<Record<string, boolean>>((acc, v) => ((acc[v] = !0), acc), {});
+export const arrToObj = (arr?: string[]) =>
+  (arr || []).reduce<Record<string, boolean>>(
+    (acc, v) => ((acc[v] = !0), acc),
+    {}
+  );
 
-export const getTagName = (elem: ParserElement) => elem.tagName.toLowerCase();
+export const allowOnlyTags =
+  (tags: string[], obj = arrToObj(tags)) =>
+  (node: ParserNode) =>
+    isNode(node) &&
+    node.nodeType === 1 &&
+    obj[(node as ParserElement).tagName.toLowerCase()]
+      ? getChildNodes((node as ParserElement).childNodes)
+      : node;
 
-export const allowOnlyTags = (tags: string[] = []) => {
-  const objTags = arrToObj(tags);
+export const forbidTags =
+  (tags: string[], obj = arrToObj(tags)) =>
+  (node: ParserNode) =>
+    isNode(node) &&
+    node.nodeType === 1 &&
+    !obj[(node as ParserElement).tagName.toLowerCase()]
+      ? getChildNodes((node as ParserElement).childNodes)
+      : node;
 
-  return (node: ParserNode) =>
-    isElement(node) ? (objTags[getTagName(node)] ? node : null) : node;
-};
+export const allowOnlyAttrs =
+  (attrs: string[], obj = arrToObj(attrs)) =>
+  (propArr: PropArr, attr: Attribute) =>
+    obj[propArr[0]] || obj[attr.name] ? null : propArr;
 
-export const forbidTags = (attrs: string[] = []) => {
-  const objTags = arrToObj(attrs);
-
-  return (node: ParserNode) =>
-    isElement(node) ? (objTags[getTagName(node)] ? null : node) : node;
-};
-
-export const allowOnlyAttrs = (attrs: string[] = []) => {
-  const objAttrs = arrToObj(attrs);
-
-  return (propArr: PropArr, attr: Attribute) =>
-    objAttrs[propArr[0]] || objAttrs[attr.name] ? propArr : null;
-};
-
-export const forbidAttrs = (attrs: string[] = []) => {
-  const objAttrs = arrToObj(attrs);
-
-  return (propArr: PropArr, attr: Attribute) =>
-    objAttrs[propArr[0]] || objAttrs[attr.name] ? null : propArr;
-};
+export const forbidAttrs =
+  (attrs: string[], obj = arrToObj(attrs)) =>
+  (propArr: PropArr, attr: Attribute) =>
+    !(obj[propArr[0]] || obj[attr.name]) ? null : propArr;

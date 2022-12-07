@@ -27,17 +27,17 @@ export const parseAttrs = (
     return acc;
   }, initialValue || {});
 
-export const styleToObject = (style: string): CSSProperties => {
+export const styleToObject = (
+  style: string,
+  rules: Record<string, string | number> = {},
+  arr?: RegExpExecArray | null,
+  key?: string
+): CSSProperties => {
   style = style.replace(STYLE_COMMENTS_REGEX, "");
-  const rules: Record<string, string | number> = {};
-  let arr: RegExpExecArray | null;
 
   while ((arr = STYLE_RULES_REGEX.exec(style))) {
-    const key = arr[1];
-    const value = arr[2];
-    const rule = key[0] === "-" ? key : camelCase(key);
-
-    rules[rule] = value;
+    key = arr[1];
+    rules[key[0] === "-" ? key : camelCase(key)] = arr[2];
   }
 
   return rules;

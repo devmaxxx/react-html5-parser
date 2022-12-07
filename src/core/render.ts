@@ -21,15 +21,16 @@ export const renderNode = (
 
   if (nodeType === 1) {
     const { childNodes, tagName, attributes } = node as RenderElement;
-    const tag = tagName.toLowerCase();
-    const children =
-      childNodes && childNodes.length ? renderNodes(childNodes, options) : null;
     const props = Object.assign(
-      { key, children },
+      {
+        key,
+        children: childNodes.length ? renderNodes(childNodes, options) : null,
+      },
       attrsToProps(Array.from(attributes), options)
     );
-
-    const reactNode = (mapElement || identity)(createElement(tag, props));
+    const reactNode = (mapElement || identity)(
+      createElement(tagName.toLowerCase(), props)
+    );
     const mapComponent =
       components &&
       isValidElement(reactNode) &&

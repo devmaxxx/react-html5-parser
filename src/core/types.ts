@@ -21,6 +21,7 @@ export type ParserNode = {
 export type ParserElement = ParserNode & {
   tagName: string;
   attributes: Attributes;
+  childNodes: ParserChildNodes;
 };
 export type RenderNode = ParserNode;
 export type RenderElement = ParserElement;

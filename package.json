@@ -89,7 +89,7 @@
     {
       "path": "./dist/index.{module,modern}.mjs",
       "import": "{ parse }",
-      "limit": "1.6 kB"
+      "limit": "1.5 kB"
     },
     {
       "path": "./dist/index.{module,modern}.mjs",
@@ -98,11 +98,11 @@
     },
     {
       "path": "./dist/index.cjs",
-      "limit": "2.7 kB"
+      "limit": "2.9 kB"
     },
     {
       "path": "./dist/index.umd.js",
-      "limit": "2.8 kB"
+      "limit": "2.9 kB"
     }
   ]
 }

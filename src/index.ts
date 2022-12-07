@@ -1,6 +1,13 @@
 import { createElement, Fragment, ReactNode } from "react";
 import { SVG_ATTRIBUTES } from "./core/constants";
-import { identity, isString } from "./core/utils";
+import {
+  identity,
+  isString,
+  allowOnlyAttrs,
+  allowOnlyTags,
+  forbidAttrs,
+  forbidTags,
+} from "./core/utils";
 import { renderNodes } from "./core/render";
 import { parseHtml } from "./core/parser";
 import { htmlAttrsMap, parseAttrs } from "./core/attributes";
@@ -14,8 +21,9 @@ const checkTypeError = (html: unknown, message: string) => {
 const parse = (html: string, options: ParseOptions = {}) => {
   let node: ReactNode = null;
 
-  const _onError = options.onError;
-  options.onError = (error: unknown) => _onError && _onError(error, { html });
+  const _onError = options.onError || identity;
+  const onError = (error: unknown) => _onError(error, { html });
+  options.onError = onError;
   options.attrsMap = Object.assign({}, htmlAttrsMap, options.attrsMap);
 
   try {
@@ -28,18 +36,23 @@ const parse = (html: string, options: ParseOptions = {}) => {
     node = createElement(
       Fragment,
       {},
-      html &&
-        renderNodes(
-          (options.parser || parseHtml)(html),
-          options as RenderOptions
-        )
+      renderNodes((options.parser || parseHtml)(html), options as RenderOptions)
     );
   } catch (error) {
-    (options as RenderOptions).onError(error);
+    onError(error);
   }
 
   return node;
 };
 
 export * from "./core/types";
-export { parse, parseAttrs, SVG_ATTRIBUTES };
+
+export {
+  parse,
+  parseAttrs,
+  SVG_ATTRIBUTES,
+  allowOnlyAttrs,
+  allowOnlyTags,
+  forbidAttrs,
+  forbidTags,
+};

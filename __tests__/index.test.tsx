@@ -93,7 +93,7 @@ describe("parse", () => {
   it("should return empty fragment for empty string", () => {
     const node = parse("");
 
-    expect(node).toStrictEqual(<>{""}</>);
+    expect(node).toStrictEqual(<>{[]}</>);
 
     const { container } = render(<>{node}</>);
 
