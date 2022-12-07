@@ -1,7 +1,13 @@
 import React from "react";
 import { render } from "@testing-library/react";
 import { parseDocument, DomUtils } from "htmlparser2";
-import { parse } from "../src";
+import {
+  forbidAttrs,
+  parse,
+  allowOnlyAttrs,
+  forbidTags,
+  allowOnlyTags,
+} from "../src";
 
 describe("parse", () => {
   it("should be defined and function", () => {
@@ -33,8 +39,16 @@ describe("parse", () => {
       return (body || doc).childNodes;
     };
 
-    const node1 = parse(html1, { parser, onError });
-    const node2 = parse(html2, { parser, onError });
+    const node1 = parse(html1, {
+      parser,
+      onError,
+      mapAttr: forbidAttrs(["class"]),
+    });
+    const node2 = parse(html2, {
+      parser,
+      onError,
+      mapAttr: forbidAttrs(["class"]),
+    });
 
     [node1, node2].map((node) => {
       const { container } = render(<>{node}</>);
@@ -42,7 +56,7 @@ describe("parse", () => {
       expect(onError).not.toBeCalled();
       expect(container).toBeVisible();
       expect(container.innerHTML.trim()).toMatchInlineSnapshot(
-        `"<div class="container" data-vce-boxed-width="true">Hello</div> world"`
+        `"<div data-vce-boxed-width="true">Hello</div> world"`
       );
     });
   });
@@ -58,7 +72,7 @@ describe("parse", () => {
   });
 
   it("should parse html temeplate", () => {
-    global.DOMParser = jest.fn().mockImplementationOnce(() => {});
+    // global.DOMParser = jest.fn().mockImplementationOnce(() => {});
 
     const node = parse(
       `<!DOCTYPE html>
@@ -68,26 +82,18 @@ describe("parse", () => {
           <title>title</title>
         </head>
         <body>
-          <div>Hello</div>
+          <div><p><span>Hello</span></p></div>
         </body>
       </html>`,
       {
-        mapNode: (n) => {
-          const node = n as Node;
-
-          if (node.nodeType === node.ELEMENT_NODE && node.nodeName === "DIV") {
-            return Array.from(node.childNodes);
-          }
-
-          return node;
-        },
+        mapNode: allowOnlyTags(["p"]),
       }
     );
 
     const { container } = render(<>{node}</>);
 
     expect(container).toBeVisible();
-    expect(container.innerHTML.trim()).toMatchInlineSnapshot(`"Hello"`);
+    expect(container.innerHTML.trim()).toMatchInlineSnapshot(`"<p>Hello</p>"`);
   });
 
   it("should return empty fragment for empty string", () => {
@@ -137,26 +143,24 @@ describe("parse", () => {
     }
 
     const node = parse(
-      `Hello,<c>!</c><div class='active' style='color: red; font-size-adjust: initial; font-weight: 600' id>, world<span style>!</span><b></b></div><input type='text' value="Submit">`,
+      `Hello<c>,</c><p hello="hello">...</p><div class='active' style='color: red; font-size-adjust: initial; font-weight: 600' id>, world<span style>!</span><h1><span>header</span></h1></div><input type='text' value="Submit"/>`,
       {
         components: {
           span: (props) => <b {...props} />,
           c: C,
         },
-        mapElement: (element) => {
-          return element;
-        },
         attrsMap: {
-          hello: "world",
+          hello: "className",
         },
-        onError: () => {},
+        mapAttr: allowOnlyAttrs(["className", "style", "id"]),
+        mapNode: forbidTags(["h1"]),
       }
     );
 
     const { getByText, container } = render(<>{node}</>);
 
     expect(container.innerHTML).toMatchInlineSnapshot(
-      `"Hello,<b>!</b><div class="active" style="color: red; font-size-adjust: initial; font-weight: 600;" id="">, world<b>!</b><b></b></div><input type="text" value="Submit">"`
+      `"Hello<b>,</b><p class="hello">...</p><div class="active" style="color: red; font-size-adjust: initial; font-weight: 600;" id="">, world<b>!</b><b>header</b></div><input>"`
     );
     const element = getByText(/world/i);
 
