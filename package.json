@@ -10,8 +10,19 @@
   "umd:main": "./dist/index.umd.js",
   "unpkg": "./dist/index.umd.js",
   "module": "./dist/index.module.mjs",
-  "exports": "./dist/index.modern.mjs",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.modern.mjs",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    },
+    "./node": {
+      "import": "./dist/node.modern.mjs",
+      "require": "./dist/node.cjs",
+      "types": "./dist/node.d.ts"
+    }
+  },
   "files": [
     "src",
     "dist",
@@ -22,7 +33,7 @@
     "dev": "microbundle watch --no-sourcemap --no-compress --generateTypes false",
     "sizecheck": "size-limit",
     "clean": "rimraf dist",
-    "build:lib": "microbundle --external react --globals react=React",
+    "build:lib": "microbundle ./src/*.ts --external react --globals react=React",
     "build:debug": "npm run build:lib -- -o build --no-compress",
     "build": "npm run clean && npm run build:lib",
     "build:size": "npm run build && npm run sizecheck",
@@ -67,7 +78,7 @@
     "rimraf": "^3.0.2",
     "size-limit": "^8.1.0",
     "ts-jest": "^29.0.3",
-    "typescript": "^4.8.4"
+    "typescript": "^4.9.4"
   },
   "peerDependencies": {
     "react": ">= 16.8.0"
@@ -104,5 +115,8 @@
       "path": "./dist/index.umd.js",
       "limit": "2.9 kB"
     }
-  ]
+  ],
+  "dependencies": {
+    "domhandler": "^5.0.3"
+  }
 }

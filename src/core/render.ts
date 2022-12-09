@@ -7,6 +7,7 @@ import {
   RenderNodeList,
   RenderNode,
   RenderElement,
+  MapNodeFn,
 } from "./types";
 
 export const renderNode = (
@@ -46,10 +47,14 @@ export const renderNode = (
 export const renderNodes = (
   nodeList: RenderNodeList,
   options: RenderOptions
-): ReactNode[] => {
-  return Array.from(nodeList).reduce<ReactNode[]>((acc, node, key) => {
+): ReactNode[] =>
+  Array.from(nodeList).reduce<ReactNode[]>((acc, node, key) => {
     try {
-      let _node = (options.mapNode || identity)(node, key, options);
+      let _node: ReturnType<MapNodeFn> = (options.mapNode || identity)(
+        node,
+        key,
+        options
+      );
 
       acc.push(
         isNode(_node)
@@ -64,4 +69,3 @@ export const renderNodes = (
 
     return acc;
   }, []);
-};

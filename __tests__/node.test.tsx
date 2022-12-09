@@ -6,10 +6,9 @@ import {
   allowOnlyAttrs,
   forbidTags,
   allowOnlyTags,
-} from "../src";
-import { parse as parseInNode } from "../src/node";
+} from "../src/node";
 
-describe("parse in node", () => {
+describe("parse in browser", () => {
   it("should be defined and function", () => {
     expect(parse).toBeDefined();
     expect(typeof parse).toBe("function");
@@ -32,11 +31,11 @@ describe("parse in node", () => {
         </body>
       </html>`;
 
-    const node1 = parseInNode(html1, {
+    const node1 = parse(html1, {
       onError,
       mapAttr: forbidAttrs(["class"]),
     });
-    const node2 = parseInNode(html2, {
+    const node2 = parse(html2, {
       onError,
       mapAttr: forbidAttrs(["class"]),
     });
