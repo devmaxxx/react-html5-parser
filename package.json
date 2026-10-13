@@ -1,62 +1,50 @@
 {
   "name": "react-html5-parser",
-  "amdName": "ReactHTMLParser",
   "version": "0.2.0",
   "sideEffects": false,
   "description": "Fast, simple and small HTML to React and React Native parser, sanitized by default",
   "type": "module",
-  "source": [
-    "./src/index.ts",
-    "./src/core.ts",
-    "./src/native.ts"
-  ],
   "main": "./dist/index.cjs",
-  "umd:main": "./dist/index.umd.js",
-  "unpkg": "./dist/index.umd.js",
-  "module": "./dist/index.module.mjs",
+  "module": "./dist/index.js",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.modern.mjs",
+      "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
     "./core": {
-      "types": "./dist/core.d.ts",
-      "import": "./dist/core.modern.mjs",
+      "import": "./dist/core.js",
       "require": "./dist/core.cjs"
     },
     "./native": {
-      "types": "./dist/native.d.ts",
-      "import": "./dist/native.modern.mjs",
+      "import": "./dist/native.js",
       "require": "./dist/native.cjs"
     },
     "./package.json": "./package.json"
   },
-  "types": "./dist/index.d.ts",
+  "types": "./dist/index.d.cts",
   "files": [
     "src",
     "dist",
     "native",
-    "README.md"
+    "README.md",
+    "EXAMPLES.md"
   ],
   "scripts": {
-    "dev": "microbundle watch --no-sourcemap --no-compress --generateTypes false",
+    "dev": "tsdown --watch",
     "sizecheck": "size-limit",
-    "clean": "rimraf dist",
-    "build:lib": "microbundle --external react,react-native,dompurify --globals react=React,react-native=ReactNative,dompurify=DOMPurify",
-    "build:debug": "npm run build:lib -- -o build --no-compress",
-    "build": "npm run clean && npm run build:lib",
+    "build": "npm run clean && tsdown && publint",
     "build:size": "npm run build && npm run sizecheck",
     "test": "npm run typecheck && jest",
     "test:watch": "jest --watchAll",
     "release": "npm run test && npm run build:size && git tag $npm_package_version && git push && git push --tags && npm publish",
-    "typecheck": "tsc --noEmit -p ."
+    "typecheck": "tsc --noEmit -p .",
+    "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\""
   },
   "author": "devmaxxx",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/devmaxxx/react-html5-parser"
+    "url": "git+https://github.com/devmaxxx/react-html5-parser.git"
   },
   "bugs": {
     "url": "https://github.com/devmaxxx/react-html5-parser/issues"
@@ -86,13 +74,13 @@
     "htmlparser2": "^12.0.0",
     "jest": "^29.2.1",
     "jest-environment-jsdom": "^29.2.1",
-    "microbundle": "^0.15.1",
     "prettier": "^2.7.1",
+    "publint": "^0.3.25",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
-    "rimraf": "^3.0.2",
     "size-limit": "^8.1.0",
     "ts-jest": "^29.4.14",
+    "tsdown": "^0.21.10",
     "typescript": "^5.9.3"
   },
   "peerDependencies": {
@@ -125,19 +113,19 @@
   "size-limit": [
     {
       "name": "parse (DOMPurify, HTML + SVG)",
-      "path": "./dist/index.modern.mjs",
+      "path": "./dist/index.js",
       "import": "{ parse }",
-      "limit": "15.2 kB"
+      "limit": "15.3 kB"
     },
     {
       "name": "core parse (no sanitizer)",
-      "path": "./dist/core.modern.mjs",
+      "path": "./dist/core.js",
       "import": "{ parse }",
-      "limit": "3 kB"
+      "limit": "3.05 kB"
     },
     {
       "name": "native parse (htmlparser2)",
-      "path": "./dist/native.modern.mjs",
+      "path": "./dist/native.js",
       "import": "{ parse }",
       "ignore": [
         "react-native"
@@ -152,5 +140,11 @@
     "react-native": {
       "optional": true
     }
+  },
+  "inlinedDependencies": {
+    "domelementtype": "3.0.0",
+    "domhandler": "6.0.1",
+    "entities": "8.1.0",
+    "htmlparser2": "12.0.0"
   }
 }
