@@ -1,17 +1,82 @@
-import { ReactNode, createElement, isValidElement } from "react";
-import { identity } from "./utils";
-import { attrsToProps, boolHtmlAttrsMap, htmlAttrsMap } from "./attributes";
-import { RenderOptions, Key } from "./types";
+import { Fragment, ReactNode, createElement } from "react";
+import { identity, own } from "./utils";
+import { attrsToProps } from "./attributes";
+import { RenderOptions, Key, ComponentProps } from "./types";
 
-export function getNodeList(html: string, _container?: HTMLElement) {
-  try {
-    _container = new DOMParser().parseFromString(html, "text/html").body;
-  } catch (_) {
-    _container = document.createElement("div");
-    _container.innerHTML = html;
+// React reports whitespace text inside these as invalid DOM nesting.
+const NO_TEXT_PARENTS = /^(table|thead|tbody|tfoot|tr|colgroup|select)$/;
+
+export function getNodeList(
+  html: string,
+  sanitizeTree?: ((root: Element) => void) | false
+) {
+  // Template content is parsed in an inert document: scripts and image loads
+  // never fire, and leading <style>/<title>/<link> stay in place instead of
+  // being moved into a <head> that is then discarded.
+  const template = document.createElement("template");
+
+  // DOMParser used to drop leading whitespace, so indented input keeps
+  // rendering without a stray text node.
+  template.innerHTML = html.replace(/^[\t\n\f\r ]+/, "");
+
+  if (!sanitizeTree) {
+    return template.content.childNodes;
   }
 
-  return _container.childNodes;
+  // Sanitizers work on an element root, not on a fragment.
+  const root = template.content.ownerDocument.createElement("div");
+
+  root.append(template.content);
+  sanitizeTree(root);
+
+  return root.childNodes;
+}
+
+function renderText(node: Node) {
+  const parent = node.parentNode as Element | null;
+  const isWhitespace = !node.nodeValue?.trim();
+
+  if (isWhitespace && NO_TEXT_PARENTS.test(parent?.localName || "")) {
+    return null;
+  }
+
+  return node.nodeValue;
+}
+
+function renderElement(
+  element: Element,
+  key?: Key,
+  options: RenderOptions = {}
+) {
+  const { mapElement, components } = options;
+  // `localName` keeps SVG case (`linearGradient`); HTML names are lowercase.
+  const tagName = element.localName;
+
+  // React 19 binds <html>, <head> and <body> to the page's own elements, even
+  // when the parser lets them through inside SVG. Only their content renders.
+  if (/^(html|head|body)$/.test(tagName)) {
+    return createElement(
+      Fragment,
+      { key },
+      renderNodes(element.childNodes, options)
+    );
+  }
+
+  const props: ComponentProps & { key?: Key } = attrsToProps(
+    element,
+    options.attrsMap
+  );
+
+  if (tagName != "textarea" && element.childNodes.length) {
+    props.children = renderNodes(element.childNodes, options);
+  }
+
+  props.key = key;
+
+  const component = own(components, tagName.toLowerCase());
+  const reactNode = createElement(component || tagName, props);
+
+  return mapElement ? mapElement(reactNode) : reactNode;
 }
 
 export function renderNode(
@@ -19,51 +84,26 @@ export function renderNode(
   key?: Key,
   options: RenderOptions = {}
 ): ReactNode {
-  const { mapNode, mapElement, components } = options;
-  const _mapNode = mapNode || identity;
-  const _node = _mapNode(node, key, options);
+  const mappedNode = (options.mapNode || identity)(node, key, options);
 
-  if (!(_node && _node instanceof Node)) {
-    return _node;
+  if (!(mappedNode instanceof Node)) {
+    return mappedNode;
   }
 
-  const nodeType = _node.nodeType;
-
-  if (nodeType === 3) {
-    return _node.nodeValue;
+  if (mappedNode.nodeType === 3) {
+    return renderText(mappedNode);
   }
 
-  if (nodeType === 1) {
-    const { childNodes, nodeName } = _node as Element;
-    const _nodeName = nodeName.toLowerCase();
-    const children = childNodes.length
-      ? renderNodes(childNodes, options)
-      : null;
-    const props = Object.assign(
-      { key, children },
-      attrsToProps(
-        _node as Element,
-        Object.assign({}, htmlAttrsMap, boolHtmlAttrsMap, options.attrsMap)
-      )
-    );
-    const mapComponent = components?.[_nodeName];
-
-    const reactNode = mapComponent
-      ? mapComponent(props)
-      : createElement(_nodeName, props);
-
-    return mapElement && isValidElement(reactNode)
-      ? mapElement(reactNode)
-      : reactNode;
+  if (mappedNode.nodeType === 1) {
+    return renderElement(mappedNode as Element, key, options);
   }
+
+  return null;
 }
 
 export function renderNodes(
   nodeList: NodeListOf<Node> | Node[],
   options?: RenderOptions
 ): ReactNode[] {
-  return Array.from(nodeList).reduce<ReactNode[]>(
-    (acc, node, key) => (acc.push(renderNode(node, key, options)), acc),
-    []
-  );
+  return Array.from(nodeList, (node, key) => renderNode(node, key, options));
 }
