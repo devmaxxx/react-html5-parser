@@ -1,8 +1,38 @@
 {
   "name": "react-html5-parser",
   "version": "0.2.0",
+  "description": "Turn HTML strings into React and React Native elements, sanitized by default. No dangerouslySetInnerHTML.",
+  "keywords": [
+    "react",
+    "react-native",
+    "html",
+    "html-parser",
+    "html-to-react",
+    "html-react-parser",
+    "react-html-parser",
+    "react-html",
+    "parser",
+    "dangerouslysetinnerhtml",
+    "sanitize",
+    "sanitizer",
+    "dompurify",
+    "xss",
+    "svg",
+    "rich-text",
+    "cms",
+    "typescript"
+  ],
+  "homepage": "https://github.com/devmaxxx/react-html5-parser#readme",
+  "bugs": {
+    "url": "https://github.com/devmaxxx/react-html5-parser/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devmaxxx/react-html5-parser.git"
+  },
+  "license": "MIT",
+  "author": "devmaxxx",
   "sideEffects": false,
-  "description": "Fast, simple and small HTML to React and React Native parser, sanitized by default",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -40,27 +70,6 @@
     "typecheck": "tsc --noEmit -p .",
     "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\""
   },
-  "author": "devmaxxx",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/devmaxxx/react-html5-parser.git"
-  },
-  "bugs": {
-    "url": "https://github.com/devmaxxx/react-html5-parser/issues"
-  },
-  "keywords": [
-    "html",
-    "parser",
-    "react",
-    "react-html",
-    "react-html-parser",
-    "html-react-parser",
-    "html-parser",
-    "react-native",
-    "sanitize",
-    "dompurify"
-  ],
   "devDependencies": {
     "@size-limit/esbuild": "^8.1.0",
     "@size-limit/file": "^8.1.0",
