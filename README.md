@@ -2,11 +2,23 @@
 
 Fast, simple and small HTML to React parser for the browser and React Native, sanitized by default
 
+[![npm version](https://img.shields.io/npm/v/react-html5-parser)](https://www.npmjs.com/package/react-html5-parser)
+[![CI](https://img.shields.io/github/actions/workflow/status/devmaxxx/react-html5-parser/ci.yml?branch=main&label=CI)](https://github.com/devmaxxx/react-html5-parser/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
+
+- Turns an HTML string into React elements, with no `dangerouslySetInnerHTML`.
+- Sanitized by default with DOMPurify, run on the parsed tree so nothing is parsed twice.
+- Swap any tag for your own component, or rewrite nodes and elements as they render.
+- A 3 kB core entry for when you bring your own sanitizer.
+- A React Native entry that renders `View`, `Text` and `Image`.
+- Never throws on bad input: returns `null` and reports through `onError`.
+- ESM and CommonJS builds, with TypeScript types.
+
 ## Install
 
 ```sh
 npm install react-html5-parser
-// or
+# or
 yarn add react-html5-parser
 ```
 
@@ -14,47 +26,98 @@ Requires React 18 or newer (`react >= 18`). The native entry also needs React Na
 
 ## Use
 
-Three entry points:
-
-| Import                      | Target       | Sanitizer                           | Size (min + gzip) |
-| --------------------------- | ------------ | ----------------------------------- | ----------------- |
-| `react-html5-parser`        | browser      | DOMPurify, on by default            | 15.1 kB           |
-| `react-html5-parser/core`   | browser      | none, bring your own via `sanitize` | 3 kB              |
-| `react-html5-parser/native` | React Native | built-in allowlist (see below)      | 26.5 kB           |
-
-The browser entries map HTML and SVG attributes to React props.
+Three entry points, one `parse` signature:
 
 ```ts
+import { parse } from "react-html5-parser"; // untrusted HTML, browser
+import { parse } from "react-html5-parser/core"; // trusted HTML, browser
+import { parse } from "react-html5-parser/native"; // React Native
+```
+
+| Entry     | Use for                        | Sanitizer                             | Size\*  |
+| --------- | ------------------------------ | ------------------------------------- | ------- |
+| default   | HTML from users, a CMS or APIs | [DOMPurify](#built-in-sanitizer)      | 15.3 kB |
+| `/core`   | HTML you trust or sanitize     | your own, via [`sanitize`](#sanitize) | 3 kB    |
+| `/native` | React Native apps              | [built-in allowlist](#react-native)   | 26.6 kB |
+
+The browser entries render DOM elements and SVG; the native entry renders `View`, `Text` and `Image`. The built-in sanitizers are always on.
+
+\*Minified and gzipped, dependencies included. Each entry loads only its own code, so `/core` never pulls in DOMPurify.
+
+Not sure? Use the default entry; switching later changes only the import.
+
+```tsx
+import { useMemo } from "react";
 import { parse } from "react-html5-parser";
 
-// Parse element
-parse("<div>Lorem ipsum</div>");
-// return createElement(React.Fragment, {}, React.createElement("div", {}, "Lorem ipsum"))
+function Article({ html }: { html: string }) {
+  // Parsing walks the whole string; redo it only when the HTML changes.
+  const content = useMemo(() => parse(html), [html]);
 
-// Parse element inside the string
-parse("Lorem <div>ipsum</div>");
-// return createElement(React.Fragment, {}, ["Lorem ", React.createElement("div", {}, "ipsum")])
+  return <article>{content}</article>;
+}
 ```
+
+`parse` returns a `React.Fragment`, so text around the tags is kept:
+
+```tsx
+parse("Hello <b>world</b>");
+// <>Hello <b>world</b></>
+```
+
+User HTML is sanitized before it renders:
+
+```tsx
+parse('<img src="x" onerror="alert(1)"><a href="javascript:alert(1)">hi</a>');
+// <><img src="x" /><a>hi</a></>
+```
+
+More recipes, such as Next.js links and images, heading anchors, code highlighting, YouTube embeds, server rendering and React Native, are in [EXAMPLES.md](EXAMPLES.md).
 
 ## API
 
-### parse `(html: string, options = {}) => React.Fragment | null`
+### parse
 
-#### Arguments
+```ts
+function parse(html: string, options?: ParseOptions | null): ReactNode;
+```
 
-- `html`: The HTML string
-- `options` (`object?`): Options
-  - `purify` (`object?`): DOMPurify config for the default entry, see below
-  - `sanitize` (`function?`): Transform or sanitize the HTML string before parsing. On the default entry DOMPurify still runs after it
-  - `components` (`object?`): Override React elements. The keys are lowercase HTML tag names (such as `div`). Each value is rendered as a React component, so it may use hooks
-  - `mapNode` (`function?`): Override Dom node
-  - `mapElement` (`function?`): Override React element. Called after `components` override; for an overridden tag it receives the component element (`element.type` is the component)
-  - `attrsMap` (`object?`): Map for converting dom attributes to react attributes
-  - `onError` (`function?`): Listen errors, if we provide not a string `html` or catch an unexpected internal error
+Each entry exports its own `parse` with the same signature. The options differ:
 
-#### Return
+| Entry                       | Options type            |
+| --------------------------- | ----------------------- |
+| `react-html5-parser`        | `SanitizedParseOptions` |
+| `react-html5-parser/core`   | `ParseOptions`          |
+| `react-html5-parser/native` | `NativeParseOptions`    |
 
-Return `React.Fragment | null`. We get `null` if html is not a string or catch an unexpected internal error
+**Returns** a `React.Fragment` holding the rendered nodes. An empty string gives an empty fragment. `parse` never throws for bad input: it returns `null` and calls `onError` instead (see [Errors](#errors)).
+
+#### Options
+
+All options are optional.
+
+| Option                                  | Type                                          | Entries       | What it does                                                |
+| --------------------------------------- | --------------------------------------------- | ------------- | ----------------------------------------------------------- |
+| [`purify`](#purify)                     | `DOMPurify.Config`                            | default       | Adjusts the built-in DOMPurify config.                      |
+| [`sanitize`](#sanitize)                 | `(html: string) => string`                    | all           | Transforms the HTML string before parsing.                  |
+| [`components`](#components)             | `{ [tag: string]: (props) => ReactNode }`     | all           | Renders a tag with your component.                          |
+| [`mapNode`](#mapnode)                   | `(node, key?, options?) => Node \| ReactNode` | default, core | Replaces, wraps or drops a DOM node before it renders.      |
+| [`mapElement`](#mapelement)             | `(element: ReactElement) => ReactNode`        | all           | Replaces or adjusts each React element after it is created. |
+| [`attrsMap`](#attrsmap)                 | `{ [attr: string]: string }`                  | default, core | Adds or overrides attribute → prop name mappings.           |
+| [`onError`](#onerror)                   | `(error: unknown, html: unknown) => void`     | all           | Receives every error `parse` catches.                       |
+| `tagStyles`, `textStyle`, `onLinkPress` | see [React Native](#react-native)             | native        | Styles and link handling for native components.             |
+
+#### How a string becomes React elements
+
+On the browser entries, in order:
+
+1. `sanitize(html)` runs on the string, if given.
+2. The string is parsed inside a `<template>` element, so nothing runs or loads.
+3. Default entry only: DOMPurify cleans the parsed tree in place, with `purify` merged over the built-in config.
+4. Each node goes through `mapNode`. A DOM node it returns renders as below; anything else is used as is.
+5. A text node becomes a string. An element's attributes become props through the built-in map plus `attrsMap` (`class` → `className`, `style` → an object, `value` → `defaultValue`, …).
+6. The element renders as its tag in `components` if mapped, or as the plain tag.
+7. `mapElement` receives the created element; what it returns is rendered.
 
 ### Built-in sanitizer
 
@@ -77,7 +140,9 @@ Limits worth knowing:
 - Attributes such as `popovertarget` and `commandfor` stay, and can open the page's own popovers and dialogs by id. Forbid them through `purify` if that matters.
 - An `id` such as `APP_CONFIG` still becomes `window.APP_CONFIG` when the page defines no global of that name. Do not read optional globals from `window` on pages that render user HTML.
 
-### purify `DOMPurify.Config`
+### purify
+
+`DOMPurify.Config`
 
 Default entry only. Merged over the built-in config, so each key you pass replaces the built-in one; `ADD_TAGS` is combined with the tags mapped in `components`.
 
@@ -94,7 +159,9 @@ parse(html, {
 
 The tree is always sanitized in place, so `IN_PLACE`, `RETURN_DOM`, `RETURN_DOM_FRAGMENT`, `RETURN_TRUSTED_TYPE` and `WHOLE_DOCUMENT` are ignored. The `position: fixed`, `javascript:` and `rel="noopener"` checks run whatever the config says.
 
-### sanitize `(html: string) => string`
+### sanitize
+
+`(html: string) => string`
 
 ```ts
 import { parse } from "react-html5-parser/core";
@@ -108,86 +175,145 @@ parse("<div>Lorem ipsum</div>", {
 
 On the default entry, DOMPurify runs after your `sanitize`, so a function that only trims or rewrites the HTML never turns sanitizing off. Use the core entry to replace DOMPurify.
 
-### components `{ [key: string]: (props: {}) => ReactNode }`
+### components
+
+`{ [tag: string]: (props) => ReactNode }`
+
+Replace a tag with your own component. Keys are lowercase tag names. The component gets the tag's attributes as props, already mapped to React names (`class` → `className`), plus `children`.
 
 ```tsx
-function Typography(props) {
-  return <span {...props} />;
-}
+import { Link } from "react-router";
+import { parse, type Components } from "react-html5-parser";
 
-// replace div with paragraph, and b with Typography
-parse("<div>Lorem <b>ipsum</b></div>", {
-  components: {
-    div: (props) => <p {...props} />,
-    b: Typography,
-  },
+// Module scope: a new object on every render would give each tag a new
+// component type, and React would remount the whole tree.
+const components: Components = {
+  // Internal links go through the router, external ones open in a new tab.
+  a: ({ href, children }) =>
+    typeof href == "string" && href.startsWith("/") ? (
+      <Link to={href}>{children}</Link>
+    ) : (
+      <a href={String(href)} target="_blank" rel="noopener noreferrer">
+        {children}
+      </a>
+    ),
+  h2: ({ id, children }) => (
+    <h2 id={id ? String(id) : undefined} className="article-heading">
+      {children}
+    </h2>
+  ),
+};
+
+parse('<h2 id="intro">Intro</h2><p>Read the <a href="/docs">docs</a>.</p>', {
+  components,
 });
+// <>
+//   <h2 id="intro" className="article-heading">Intro</h2>
+//   <p>Read the <Link to="/docs">docs</Link>.</p>
+// </>
 ```
 
-JSX
+Components render inside React, so they may use hooks and context.
 
-```jsx
-<>
-  <p>
-    Lorem <span>ipsum</span>
-  </p>
-</>
-```
+### mapNode
 
-### mapNode `(node: Node, key: number | string, options = {}) => Node | ReactNode`
+`(node: Node, key?: number | string, options?) => Node | ReactNode`
 
-```ts
-import { parse, renderNode, renderNodes } from "react-html5-parser";
+Runs on every DOM node before it renders. Return the node (or another DOM node) to render it as usual, or return a React node to render that instead. `null` drops the node.
 
-parse("<div>Lorem <b>ipsum</b></div>", {
-  mapNode: (node: Node, key: string | number, options = {}) => {
-    // return renderNode(node, key, options); // render node as react node
-    // return renderNodes(node.childNodes, options); // render only childNodes
+```tsx
+import { parse, renderNode } from "react-html5-parser";
+
+parse(html, {
+  mapNode: (node, key, options) => {
+    // Drop empty paragraphs left by rich-text editors.
+    if (node.nodeName == "P" && !node.textContent?.trim()) {
+      return null;
+    }
+
+    // Wrap wide tables in a scroll container. Render the table itself
+    // without mapNode, or renderNode would call this function again forever.
+    if (node.nodeName == "TABLE") {
+      return (
+        <div key={key} className="table-scroll">
+          {renderNode(node, key, { ...options, mapNode: undefined })}
+        </div>
+      );
+    }
 
     return node;
   },
 });
 ```
 
-### mapElement `(element: ReactElement) => ReactNode`
+`renderNode` and `renderNodes` are exported for this: `renderNodes(node.childNodes, options)` renders only a node's content.
 
-```ts
-parse("<div>Lorem <b>ipsum</b></div>", {
-  mapElement: (element: ReactElement) => {
-    if (element.type === "p") {
-      return <element.type {...element.props} />;
-    }
+### mapElement
 
-    return element;
-  },
+`(element: ReactElement) => ReactNode`
+
+Runs on every React element after it is created, `components` included. Use it to adjust props without replacing the tag.
+
+```tsx
+import { cloneElement, type ReactElement } from "react";
+import { parse } from "react-html5-parser";
+
+parse(html, {
+  mapElement: (element: ReactElement) =>
+    element.type == "img"
+      ? cloneElement(element, { loading: "lazy", decoding: "async" })
+      : element,
 });
 ```
 
-### attrsMap `{ [key: string]: string }`
+### attrsMap
+
+`{ [attr: string]: string }`
 
 HTML and SVG attributes are mapped by default. `attrsMap` adds to or overrides that mapping.
 
-```ts
+```tsx
 import { parse } from "react-html5-parser";
 
-// map custom attrs, convert classname to class
-parse("<div classname='a'>Lorem <b>ipsum</b></div>", {
-  attrsMap: { classname: "className" },
+// Turn the CMS's tooltip attribute into a native title.
+parse("<abbr data-tooltip='HyperText Markup Language'>HTML</abbr>", {
+  attrsMap: { "data-tooltip": "title" },
 });
+// <><abbr title="HyperText Markup Language">HTML</abbr></>
 ```
 
-### onError `(error: unknown, html: unknown) => void`
+On the default entry DOMPurify runs first and removes attributes it does not know, so a nonstandard attribute such as `classname` needs `purify: { ADD_ATTR: ["classname"] }` before `attrsMap` can see it. `data-*` and `aria-*` attributes are always kept.
+
+### onError
+
+`(error: unknown, html: unknown) => void`
+
+`parse` never throws for bad input; it calls `onError` and returns `null`. Use that to show a fallback and report the error.
 
 ```tsx
-// if we provide incorrect html, or get internal error
-const res: null = parse(undefined, {
-  onError: (error: unknown, html: unknown) => {
-    bugsnag.notify(error, (event) => {
-      event.addMetadata("htmlparser", { html });
-    });
-  },
-});
+function Article({ html }: { html: string }) {
+  const content = useMemo(
+    () =>
+      parse(html, {
+        onError: (error, html) => reportError({ error, html }),
+      }),
+    [html]
+  );
+
+  return content ?? <p>This article could not be displayed.</p>;
+}
 ```
+
+See [Errors](#errors) for every case that reaches `onError`.
+
+### Other exports
+
+The default and core entries also export:
+
+- `renderNode(node, key?, options?)` and `renderNodes(nodes, options?)`: render DOM nodes the way `parse` does. Use them inside `mapNode`.
+- `parseAttrs(attrs: string, initial?)`: builds an attribute map like the built-in one from a space-separated list, mapping each name and its lowercase form to camelCase (`stroke-width` → `strokeWidth`).
+- `SVG_ATTRIBUTES`: the space-separated list of SVG attributes the built-in map covers.
+- Types: `ParseOptions`, `RenderOptions`, `Components`, `ComponentProps`, `MapNodeFn`, `MapElementFn`, `AttributesMap`; plus `SanitizedParseOptions` and `PurifyConfig` from the default entry, and `NativeParseOptions`, `NativeTagStyle`, `NativeComponentProps` from the native entry.
 
 ## React Native
 
@@ -243,3 +369,22 @@ An error thrown inside `onError` reaches the caller. A component from `component
 - `<noscript>` content is parsed as text, as browsers do while scripting is enabled.
 - `hidden="until-found"` becomes plain `hidden`: React 19 treats `hidden` as a boolean.
 - In the core entry, `async` is dropped from `<script>`, so React 19 renders it inert instead of hoisting and running it, and `<title>`, `<meta>` and `<link>` are hoisted into the document `<head>` by React 19.
+
+## Development
+
+```sh
+git clone https://github.com/devmaxxx/react-html5-parser.git
+cd react-html5-parser
+npm install
+npm test             # typecheck + Jest
+npm run build        # tsdown to dist/ (ESM + CJS + types), then publint
+npm run build:size   # build, then check the size limits above
+```
+
+## Contributing
+
+Issues and pull requests are welcome at [github.com/devmaxxx/react-html5-parser](https://github.com/devmaxxx/react-html5-parser). For a bug, include the HTML string and the options you passed to `parse`. A pull request should come with a test in `__tests__/` and keep `npm test` and `npm run build:size` green.
+
+## License
+
+[MIT](LICENSE.md)
