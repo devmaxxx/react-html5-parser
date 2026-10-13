@@ -1,0 +1,7 @@
+{
+  "name": "react-html5-parser/native",
+  "private": true,
+  "main": "../dist/native.cjs",
+  "module": "../dist/native.modern.mjs",
+  "types": "../dist/native.d.ts"
+}

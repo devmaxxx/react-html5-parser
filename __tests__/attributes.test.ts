@@ -25,7 +25,7 @@ function filterAttrs(
   }, {});
 }
 
-function attrsObjToNode(attrs: Record<string, any>): any {
+function attrsObjToNode(attrs: Record<string, any>, localName = "input"): any {
   const attributes = Object.entries(attrs).reduce<Attr[]>(
     (acc, [nodeName, nodeValue]) => (
       acc.push({ nodeName, nodeValue } as Attr), acc
@@ -34,6 +34,7 @@ function attrsObjToNode(attrs: Record<string, any>): any {
   );
 
   return {
+    localName,
     attributes,
     getAttribute: (name: string) => attrs[name],
   };

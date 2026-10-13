@@ -10,7 +10,7 @@ export type { CSSProperties };
 export type Key = number | string;
 export type Attributes = Record<
   string,
-  string | number | boolean | CSSProperties
+  string | string[] | number | boolean | CSSProperties
 >;
 export type AttributesMap = Record<string, string>;
 export type MapNodeFn = (
@@ -19,9 +19,8 @@ export type MapNodeFn = (
   options?: RenderOptions
 ) => Node | ReactNode;
 export type MapElementFn = (element: ReactElement) => ReactNode;
-export type MapComponentFn = (
-  props: PropsWithChildren<Attributes & { key?: Key }>
-) => ReactNode;
+export type ComponentProps = PropsWithChildren<Attributes>;
+export type MapComponentFn = (props: ComponentProps) => ReactNode;
 export type Components = Record<string, MapComponentFn>;
 export type RenderOptions = {
   components?: Components;
@@ -29,7 +28,8 @@ export type RenderOptions = {
   mapElement?: MapElementFn;
   attrsMap?: AttributesMap;
 };
-export type ParseOptions = RenderOptions & {
+export type BaseParseOptions = {
   sanitize?: (html: string) => string;
   onError?: (error: unknown, html: unknown) => void;
 };
+export type ParseOptions = RenderOptions & BaseParseOptions;

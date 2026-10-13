@@ -57,8 +57,6 @@ describe("parse", () => {
   });
 
   it("should parse components", () => {
-    global.DOMParser = jest.fn().mockImplementationOnce(() => {});
-
     const node = parse(
       `Hello,<c>!</c><div class='active' style='color: red; font-size-adjust: initial; font-weight: 600' id>, world<span style>!</span><b></b></div><input type='text' value="Submit">`,
       {
