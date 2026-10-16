@@ -409,6 +409,8 @@ npm run build        # tsdown to dist/ (ESM + CJS + types), then publint
 npm run build:size   # build, then check the size limits above
 ```
 
+To release, bump `version` in `package.json`, add its section to `CHANGELOG.md`, merge, then run `npm run release` on `main`. It tags the version and pushes the tag; the Release workflow publishes to npm with provenance and creates the GitHub release from the changelog section.
+
 ## Contributing
 
 Issues and pull requests are welcome at [github.com/devmaxxx/react-html5-parser](https://github.com/devmaxxx/react-html5-parser). For a bug, include the HTML string and the options you passed to `parse`. A pull request should come with a test in `__tests__/` and keep `npm test` and `npm run build:size` green.

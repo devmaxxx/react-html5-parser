@@ -85,7 +85,7 @@
     "build:size": "npm run build && npm run sizecheck",
     "test": "npm run typecheck && jest",
     "test:watch": "jest --watchAll",
-    "release": "npm run test && npm run build:size && git tag $npm_package_version && git push && git push --tags && npm publish",
+    "release": "npm run test && npm run build:size && git tag $npm_package_version && git push && git push origin $npm_package_version",
     "typecheck": "tsc --noEmit -p .",
     "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\""
   },
