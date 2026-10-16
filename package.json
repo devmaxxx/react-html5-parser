@@ -31,23 +31,41 @@
     "url": "git+https://github.com/devmaxxx/react-html5-parser.git"
   },
   "license": "MIT",
-  "author": "devmaxxx",
+  "author": "Max Syn (https://github.com/devmaxxx)",
   "sideEffects": false,
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./core": {
-      "import": "./dist/core.js",
-      "require": "./dist/core.cjs"
+      "import": {
+        "types": "./dist/core.d.ts",
+        "default": "./dist/core.js"
+      },
+      "require": {
+        "types": "./dist/core.d.cts",
+        "default": "./dist/core.cjs"
+      }
     },
     "./native": {
-      "import": "./dist/native.js",
-      "require": "./dist/native.cjs"
+      "import": {
+        "types": "./dist/native.d.ts",
+        "default": "./dist/native.js"
+      },
+      "require": {
+        "types": "./dist/native.d.cts",
+        "default": "./dist/native.cjs"
+      }
     },
     "./package.json": "./package.json"
   },
@@ -57,6 +75,7 @@
     "dist",
     "native",
     "README.md",
+    "CHANGELOG.md",
     "EXAMPLES.md"
   ],
   "scripts": {
@@ -155,5 +174,8 @@
     "domhandler": "6.0.1",
     "entities": "8.1.0",
     "htmlparser2": "12.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
