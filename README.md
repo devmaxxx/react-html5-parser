@@ -1,18 +1,42 @@
+<div align="center">
+
 # react-html5-parser
 
-Fast, simple and small HTML to React parser for the browser and React Native, sanitized by default
+**Turn HTML strings into React and React Native elements, sanitized by default.**
 
 [![npm version](https://img.shields.io/npm/v/react-html5-parser)](https://www.npmjs.com/package/react-html5-parser)
+[![npm downloads](https://img.shields.io/npm/dm/react-html5-parser)](https://www.npmjs.com/package/react-html5-parser)
+[![types](https://img.shields.io/npm/types/react-html5-parser)](#other-exports)
 [![CI](https://img.shields.io/github/actions/workflow/status/devmaxxx/react-html5-parser/ci.yml?branch=main&label=CI)](https://github.com/devmaxxx/react-html5-parser/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
 
-- Turns an HTML string into React elements, with no `dangerouslySetInnerHTML`.
-- Sanitized by default with DOMPurify, run on the parsed tree so nothing is parsed twice.
-- Swap any tag for your own component, or rewrite nodes and elements as they render.
-- A 3 kB core entry for when you bring your own sanitizer.
-- A React Native entry that renders `View`, `Text` and `Image`.
-- Never throws on bad input: returns `null` and reports through `onError`.
-- ESM and CommonJS builds, with TypeScript types.
+[Install](#install) · [Use](#use) · [API](#api) · [React Native](#react-native) · [Examples](EXAMPLES.md) · [Changelog](CHANGELOG.md)
+
+</div>
+
+## Features
+
+- **No `dangerouslySetInnerHTML`.** HTML becomes real React elements you can map, wrap and replace.
+- **Safe by default.** DOMPurify runs on the parsed tree, so nothing is parsed twice and the checked tree is the rendered tree.
+- **The browser's own HTML5 parser.** Markup is read exactly as the page would read it, inside an inert `<template>`.
+- **Your components.** Swap any tag for a component, or rewrite nodes and elements as they render.
+- **3 kB core** for HTML you trust or sanitize yourself.
+- **React Native** entry that renders `View`, `Text` and `Image`.
+- **Never throws** on bad input: returns `null` and reports through `onError`.
+- **ESM and CommonJS**, with TypeScript types for every entry.
+
+## Contents
+
+- [Install](#install)
+- [Use](#use)
+- [API](#api): [`parse`](#parse), [options](#options), [built-in sanitizer](#built-in-sanitizer), [`purify`](#purify), [`sanitize`](#sanitize), [`components`](#components), [`mapNode`](#mapnode), [`mapElement`](#mapelement), [`attrsMap`](#attrsmap), [`onError`](#onerror), [other exports](#other-exports)
+- [React Native](#react-native)
+- [Errors](#errors)
+- [Notes](#notes)
+- [Upgrading from 0.x](#upgrading-from-0x)
+- [Development](#development)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Install
 
@@ -23,6 +47,8 @@ yarn add react-html5-parser
 ```
 
 Requires React 18 or newer (`react >= 18`). The native entry also needs React Native 0.71 or newer.
+
+The browser entries parse with the DOM, so on the server `parse` returns `null`. See [server rendering](EXAMPLES.md#server-rendering) for the client-side pattern.
 
 ## Use
 
@@ -415,6 +441,8 @@ To release, bump `version` in `package.json`, add its section to `CHANGELOG.md`,
 
 Issues and pull requests are welcome at [github.com/devmaxxx/react-html5-parser](https://github.com/devmaxxx/react-html5-parser). For a bug, include the HTML string and the options you passed to `parse`. A pull request should come with a test in `__tests__/` and keep `npm test` and `npm run build:size` green.
 
+Release notes for every version are in [CHANGELOG.md](CHANGELOG.md) and on the [releases page](https://github.com/devmaxxx/react-html5-parser/releases).
+
 ## License
 
-[MIT](LICENSE.md)
+[MIT](LICENSE.md) © Maksym Synenko
