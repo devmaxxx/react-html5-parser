@@ -370,6 +370,34 @@ An error thrown inside `onError` reaches the caller. A component from `component
 - `hidden="until-found"` becomes plain `hidden`: React 19 treats `hidden` as a boolean.
 - In the core entry, `async` is dropped from `<script>`, so React 19 renders it inert instead of hoisting and running it, and `<title>`, `<meta>` and `<link>` are hoisted into the document `<head>` by React 19.
 
+## Upgrading from 0.x
+
+1.0 sanitizes by default and needs React 18. Every change is in the [changelog](CHANGELOG.md#100).
+
+**Keep the 0.x output.** Import from the core entry. It is the 0.x parser with the 1.0 fixes, and runs only the `sanitize` you pass:
+
+```diff
+- import { parse } from "react-html5-parser";
++ import { parse } from "react-html5-parser/core";
+```
+
+**Stay on the default entry.** Check what DOMPurify now removes from your content (see [Built-in sanitizer](#built-in-sanitizer)), then:
+
+- Drop your own DOMPurify call from `sanitize`; the built-in one runs anyway. Keep `sanitize` only for rewrites.
+- Allow a tag or attribute you need through `purify`, or map the tag in `components`:
+
+  ```ts
+  parse(html, { purify: { ADD_ATTR: ["contenteditable"] } });
+  ```
+
+**`components`.** Entries are now rendered as React components, not called as functions:
+
+- Define the map at module scope. An inline object or arrow function gives the tag a new component type on every render, and React remounts its subtree.
+- Return `null`, not `undefined`, to render nothing. React 18 throws on `undefined`.
+- `mapElement` now receives the `<YourComponent>` element for a mapped tag, not what your component returned.
+
+**Types.** `MapComponentFn` props are now `ComponentProps` and no longer include `key`.
+
 ## Development
 
 ```sh
@@ -380,6 +408,8 @@ npm test             # typecheck + Jest
 npm run build        # tsdown to dist/ (ESM + CJS + types), then publint
 npm run build:size   # build, then check the size limits above
 ```
+
+To release, bump `version` in `package.json`, add its section to `CHANGELOG.md`, merge, then run `npm run release` on `main`. It tags the version and pushes the tag; the Release workflow publishes to npm with provenance and creates the GitHub release from the changelog section.
 
 ## Contributing
 
