@@ -31,7 +31,7 @@
     "url": "git+https://github.com/devmaxxx/react-html5-parser.git"
   },
   "license": "MIT",
-  "author": "Max Syn (https://github.com/devmaxxx)",
+  "author": "Maksym Synenko (https://github.com/devmaxxx)",
   "sideEffects": false,
   "type": "module",
   "main": "./dist/index.cjs",
