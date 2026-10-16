@@ -43,6 +43,8 @@
 ```sh
 npm install react-html5-parser
 # or
+pnpm add react-html5-parser
+# or
 yarn add react-html5-parser
 ```
 

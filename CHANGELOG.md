@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.2
+
+- README: new header, features list, table of contents, install command for pnpm, and a note that the browser entries need a DOM.
+
 ## 1.0.1
 
 - `exports` names the type file for each entry and module format, so TypeScript picks `.d.ts` for `import` and `.d.cts` for `require` without guessing.
