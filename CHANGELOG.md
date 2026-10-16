@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.0.1
 
 - `exports` names the type file for each entry and module format, so TypeScript picks `.d.ts` for `import` and `.d.cts` for `require` without guessing.
 - The package ships `CHANGELOG.md`, and `author` names the maintainer.
