@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="assets/logo.svg" width="120" height="120" alt="react-html5-parser logo">
+
 # react-html5-parser
 
 **Turn HTML strings into React and React Native elements, sanitized by default.**
