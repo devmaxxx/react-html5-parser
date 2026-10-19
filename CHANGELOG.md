@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.3
+
+- README: project logo in the header.
+
 ## 1.0.2
 
 - README: new header, features list, table of contents, install command for pnpm, and a note that the browser entries need a DOM.
