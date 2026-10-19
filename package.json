@@ -1,6 +1,6 @@
 {
   "name": "react-html5-parser",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Turn HTML strings into React and React Native elements, sanitized by default. No dangerouslySetInnerHTML.",
   "keywords": [
     "react",
